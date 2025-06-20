@@ -120,12 +120,18 @@ function showPage(evt, pageId) {
       }
     }
 
-    function logout() {
-      if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-        alert('Déconnexion...');
-        // Logique de déconnexion ici
-      }
-    }
+function logout() {
+  if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+    // Réinitialiser l'interface et revenir à la page de connexion
+    showPage(null, 'accueil');
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+
+    document.getElementById('loginPage').style.display = '';
+    document.querySelector('header').style.display = 'none';
+    document.querySelector('nav.nav-tabs').style.display = 'none';
+    document.querySelector('.content').style.display = 'none';
+  }
+}
 
     // Gestion de l'édition des informations utilisateur
     let originalUserData = {};
