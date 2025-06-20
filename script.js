@@ -114,9 +114,23 @@ function showPage(evt, pageId) {
     // Fonctions pour les paramètres
     function resetSEA() {
       if (confirm('Êtes-vous sûr de vouloir réinitialiser votre SEA ?')) {
-        alert('SEA réinitialisé !');
-        seaActive = true;
+        // Remise à zéro des paramètres du SEA
+        seaActive = false;
+
+        document.getElementById('montant').value = 200;
+        document.getElementById('jour').selectedIndex = 0;
+        document.getElementById('compteDepart').selectedIndex = 0;
+        document.getElementById('destination').selectedIndex = 0;
+
         updateSeaStatus();
+
+        alert('SEA réinitialisé !');
+
+        // Rediriger vers la page de configuration du SEA
+        showPage(null, 'sea');
+        // Activer l'onglet SEA
+        document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-tab')[1].classList.add('active');
       }
     }
 
@@ -253,6 +267,28 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
 
   showPage(null, 'accueil');
   document.querySelector('.nav-tab').classList.add('active');
+});
+
+// Changement vers la page d'inscription
+document.getElementById('showRegisterLink').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('registerPage').style.display = '';
+});
+
+// Retour à la page de connexion
+document.getElementById('showLoginLink').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.getElementById('registerPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = '';
+});
+
+// Gestion simple de l'inscription
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  alert("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+  document.getElementById('registerPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = '';
 });
 
     // Animation d'entrée

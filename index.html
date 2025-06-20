@@ -19,8 +19,35 @@
           <label for="loginPassword">Mot de passe</label>
           <input type="password" id="loginPassword" required />
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;">Se connecter</button>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Se connecter</button>
       </form>
+      <p style="text-align:center; margin-top:1rem;">
+        Pas encore inscrit ? <a href="#" id="showRegisterLink">Créer un compte</a>
+      </p>
+    </div>
+  </div>
+
+  <div id="registerPage" class="login-page" style="display:none;">
+    <div class="card" style="max-width: 400px; margin: 2rem auto;">
+      <h2 style="margin-bottom:1rem; text-align:center;">Inscription</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="registerName">Nom</label>
+          <input type="text" id="registerName" required />
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" required />
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Mot de passe</label>
+          <input type="password" id="registerPassword" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">S'inscrire</button>
+      </form>
+      <p style="text-align:center; margin-top:1rem;">
+        Déjà inscrit ? <a href="#" id="showLoginLink">Se connecter</a>
+      </p>
     </div>
   </div>
 
