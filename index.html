@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEA-app</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Mon SEA</h1>
+  </header>
+  <!-- Navigation -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('accueil')">
+      🏠<br>Accueil
+    </button>
+    <button class="nav-tab" onclick="showPage('sea')">
+      🎯<br>SEA
+    </button>
+    <button class="nav-tab" onclick="showPage('historique')">
+      📊<br>Historique
+    </button>
+    <button class="nav-tab" onclick="showPage('parametres')">
+      ⚙️<br>Paramètres
+    </button>
+  </nav>
+<div class="content">
+    <!-- Page d'accueil/tableau de bord SEA -->
+    <div id="accueil" class="page active">
+      <div class="hero-card">
+        <h3>🎯 Félicitations !</h3>
+        <p>Tu épargnes régulièrement depuis 12 mois. Continue comme ça !</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h5>Ce mois</h5>
+          <p>200€</p>
+        </div>
+        <div class="stat-card">
+          <h5>Total épargné</h5>
+          <p>2400€</p>
+        </div>
+      </div>
+
+      <div class="progress-container">
+        <h4>Progression mensuelle</h4>
+        <div class="next-payment">
+          📅 Prochain prélèvement : 05/07/2025
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="margin-bottom: 1rem;">Actions rapides</h4>
+        <button class="btn btn-primary" onclick="showPage('sea')" style="width: 100%;">
+          ✏️ Modifier mon SEA
+        </button>
+      </div>
+    </div>
+
+    <!-- Page de configuration SEA -->
+    <div id="sea" class="page">
+      <div class="card">
+        <h2 style="margin-bottom: 1.5rem;">Configuration SEA</h2>
+        <form id="seaForm">
+          <div class="form-group">
+            <label for="montant">Montant à épargner chaque mois (€)</label>
+            <input type="number" id="montant" name="montant" value="200" min="1">
+          </div>
+
+          <div class="form-group">
+            <label for="jour">Date de prélèvement souhaitée</label>
+            <select id="jour" name="prelevement_day">
+              <option value="">-- Choisissez un jour --</option>
+              <option value="1">01 du mois</option>
+              <option value="2">02 du mois</option>
+              <option value="3">03 du mois</option>
+              <option value="4">04 du mois</option>
+              <option value="5" selected>05 du mois</option>
+              <option value="6">06 du mois</option>
+              <option value="7">07 du mois</option>
+              <option value="8">08 du mois</option>
+              <option value="9">09 du mois</option>
+              <option value="10">10 du mois</option>
+              <option value="11">11 du mois</option>
+              <option value="12">12 du mois</option>
+              <option value="13">13 du mois</option>
+              <option value="14">14 du mois</option>
+              <option value="15">15 du mois</option>
+              <option value="16">16 du mois</option>
+              <option value="17">17 du mois</option>
+              <option value="18">18 du mois</option>
+              <option value="19">19 du mois</option>
+              <option value="20">20 du mois</option>
+              <option value="21">21 du mois</option>
+              <option value="22">22 du mois</option>
+              <option value="23">23 du mois</option>
+              <option value="24">24 du mois</option>
+              <option value="25">25 du mois</option>
+              <option value="26">26 du mois</option>
+              <option value="27">27 du mois</option>
+              <option value="28">28 du mois</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="compteDepart">Compte de départ</label>
+            <select id="compteDepart" name="compteDepart">
+              <option value="">--Choisissez le Compte à Prélever--</option>
+              <option value="compteCourant">Compte Courant</option>
+              </select>
+          </div>
+
+          <div class="form-group">
+            <label for="destination">Compte de Destination</label>
+            <select id="destination" name="destination">
+              <option value="">--Choisissez le Compte à remplir--</option>
+              <option value="livretA">Livret A</option>
+              <option value="ldds">LDDS</option>
+              <option value="pea">PEA</option>
+              <option value="cto">CTO</option>
+              </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="showPage('accueil')">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Sauvegarder
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Statut du SEA avec bouton de désactivation -->
+      <div id="seaStatusCard" class="card" style="background: #f0fdf4; border-color: #bbf7d0;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span id="seaStatusIcon" style="color: #16a34a; font-size: 1.25rem;">✅</span>
+            <div>
+              <h4 id="seaStatusTitle" style="color: #166534; margin-bottom: 0.25rem;">SEA Actif</h4>
+              <p id="seaStatusText" style="color: #15803d; font-size: 0.875rem;">Votre épargne automatisée fonctionne parfaitement</p>
+            </div>
+          </div>
+          <button id="toggleSeaBtn" type="button" class="btn btn-danger" onclick="showDeactivateModal()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+            ❌ Désactiver
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique des virements -->
+    <div id="historique" class="page">
+      <h2 style="margin-bottom: 1.5rem;">Historique des virements</h2>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Mois</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Date prévue</th>
+              <th>Date confirmée</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Juin</td>
+              <td>200€</td>
+              <td class="status-confirmed">✅ Confirmé</td>
+              <td>05/06</td>
+              <td>05/06</td>
+            </tr>
+            <tr>
+              <td>Mai</td>
+              <td>200€</td>
+              <td class="status-pending">❌ Non confirmé</td>
+              <td>05/05</td>
+              <td>–</td>
+            </tr>
+            <tr>
+              <td>Avril</td>
+              <td>150€</td>
+              <td class="status-confirmed">✅ Confirmé</td>
+              <td>05/04</td>
+              <td>05/04</td>
+            </tr>
+            <tr>
+              <td>Mars</td>
+              <td>200€</td>
+              <td class="status-confirmed">✅ Confirmé</td>
+              <td>05/03</td>
+              <td>05/03</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Page Paramètres -->
+ <div id="parametres" class="page">
+      <h2 style="margin-bottom: 1.5rem;">Paramètres</h2>
+
+      <div class="card">
+        <div class="settings-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>Informations utilisateur</h3>
+            <button class="btn btn-secondary" id="editUserBtn" onclick="toggleUserEdit()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+              ✏️ Modifier
+            </button>
+          </div>
+          <div class="form-group">
+            <label for="name">Nom</label>
+            <input type="text" id="name" name="name" value="Jean Dupont" disabled>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="jean@example.com" disabled>
+          </div>
+          <div id="userFormActions" class="form-actions" style="display: none; margin-top: 1rem;">
+            <button type="button" class="btn btn-secondary" onclick="cancelUserEdit()">
+              Annuler
+            </button>
+            <button type="button" class="btn btn-primary" onclick="saveUserInfo()">
+              Sauvegarder
+            </button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="settings-section">
+          <h3>Notifications</h3>
+          <div class="checkbox-group">
+            <input type="checkbox" id="notifications" checked>
+            <label for="notifications">Activer les notifications</label>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="settings-section">
+          <h3>Actions</h3>
+          <button class="btn btn-secondary" onclick="resetSEA()" style="margin-bottom: 0.5rem; width: 100%;">
+            🔄 Réinitialiser le SEA
+          </button>
+          <button class="btn btn-primary" onclick="logout()" style="width: 100%;">
+            🚪 Se déconnecter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmation pour désactivation -->
+  <div id="deactivateModal" class="modal-overlay">
+    <div class="modal">
+      <h3>⚠️ Confirmation</h3>
+      <p>Vous êtes sûr de vouloir désactiver votre SEA ?<br><br>
+      Vos virements automatiques seront suspendus jusqu'à réactivation.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeDeactivateModal()">
+          Annuler
+        </button>
+        <button type="button" class="btn btn-danger" onclick="confirmDeactivateSEA()">
+          Valider
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!--JavaScript-->
+ <script src="script.js"></script>
+</body>
+</html>
