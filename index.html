@@ -179,21 +179,20 @@
       </div>
 
       <!-- Statut du SEA avec bouton de désactivation -->
-      <div id="seaStatusCard" class="card" style="background: #f0fdf4; border-color: #bbf7d0;">
+   <div id="seaStatusCard" class="card" style="background: #fef2f2; border-color: #fecaca;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span id="seaStatusIcon" style="color: #16a34a; font-size: 1.25rem;">✅</span>
+            <span id="seaStatusIcon" style="color: #dc2626; font-size: 1.25rem;">❌</span>
             <div>
-              <h4 id="seaStatusTitle" style="color: #166534; margin-bottom: 0.25rem;">SEA Actif</h4>
-              <p id="seaStatusText" style="color: #15803d; font-size: 0.875rem;">Votre épargne automatisée fonctionne parfaitement</p>
+              <h4 id="seaStatusTitle" style="color: #991b1b; margin-bottom: 0.25rem;">SEA Inactif</h4>
+              <p id="seaStatusText" style="color: #dc2626; font-size: 0.8rem;">Votre épargne automatisée est suspendue</p>
             </div>
           </div>
-          <button id="toggleSeaBtn" type="button" class="btn btn-danger" onclick="showDeactivateModal()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-            ❌ Désactiver
+          <button id="toggleSeaBtn" type="button" class="btn btn-primary" onclick="reactivateSEA()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+            ✅ Réactiver
           </button>
         </div>
       </div>
-    </div>
 
     <!-- Historique des virements -->
     <div id="historique" class="page">

@@ -1,5 +1,5 @@
  // Variable pour suivre l'état du SEA
-    let seaActive = true;
+    let seaActive = false;
 
     // Navigation entre les pages
 function showPage(evt, pageId) {
@@ -298,4 +298,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         document.body.style.transition = 'opacity 0.3s';
         document.body.style.opacity = '1';
       }, 100);
+
+      // Initialiser l'état du SEA lors du chargement
+      updateSeaStatus();
     });
