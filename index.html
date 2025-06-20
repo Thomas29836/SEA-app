@@ -7,25 +7,42 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
+  <div id="loginPage" class="login-page">
+    <div class="card" style="max-width: 400px; margin: 2rem auto;">
+      <h2 style="margin-bottom:1rem; text-align:center;">Connexion</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Mot de passe</label>
+          <input type="password" id="loginPassword" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Se connecter</button>
+      </form>
+    </div>
+  </div>
+
+  <header style="display:none;">
     <h1>Mon SEA</h1>
   </header>
   <!-- Navigation -->
-  <nav class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('accueil')">
+  <nav class="nav-tabs" style="display:none;">
+    <button class="nav-tab active" onclick="showPage(event, 'accueil')">
       🏠<br>Accueil
     </button>
-    <button class="nav-tab" onclick="showPage('sea')">
+    <button class="nav-tab" onclick="showPage(event, 'sea')">
       🎯<br>SEA
     </button>
-    <button class="nav-tab" onclick="showPage('historique')">
+    <button class="nav-tab" onclick="showPage(event, 'historique')">
       📊<br>Historique
     </button>
-    <button class="nav-tab" onclick="showPage('parametres')">
+    <button class="nav-tab" onclick="showPage(event, 'parametres')">
       ⚙️<br>Paramètres
     </button>
   </nav>
-<div class="content">
+<div class="content" style="display:none;">
     <!-- Page d'accueil/tableau de bord SEA -->
     <div id="accueil" class="page active">
       <div class="hero-card">
@@ -53,7 +70,7 @@
 
       <div class="card">
         <h4 style="margin-bottom: 1rem;">Actions rapides</h4>
-        <button class="btn btn-primary" onclick="showPage('sea')" style="width: 100%;">
+         <button class="btn btn-primary" onclick="showPage(event, 'sea')" style="width: 100%;">
           ✏️ Modifier mon SEA
         </button>
       </div>
@@ -124,7 +141,7 @@
           </div>
 
           <div class="form-actions">
-            <button type="button" class="btn btn-secondary" onclick="showPage('accueil')">
+            <button type="button" class="btn btn-secondary" onclick="showPage(event, 'accueil')">
               Annuler
             </button>
             <button type="submit" class="btn btn-primary">

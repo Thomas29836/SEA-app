@@ -73,9 +73,16 @@
       display: none;
     }
 
-    .page.active {
-      display: block;
-    }
+ .page.active {
+  display: block;
+}
+
+/* Login page */
+.login-page {
+  padding: 1rem;
+  max-width: 500px;
+  margin: 2rem auto;
+}
 
     /* Cards et sections */
     .card {

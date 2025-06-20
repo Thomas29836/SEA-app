@@ -2,11 +2,11 @@
     let seaActive = true;
 
     // Navigation entre les pages
-    function showPage(pageId) {
-      // Masquer toutes les pages
-      document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-      });
+function showPage(evt, pageId) {
+  // Masquer toutes les pages
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.remove('active');
+  });
       
       // Désactiver tous les onglets
       document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -14,11 +14,13 @@
       });
       
       // Afficher la page sélectionnée
-      document.getElementById(pageId).classList.add('active');
-      
-      // Activer l'onglet correspondant
-      event.target.classList.add('active');
-    }
+       document.getElementById(pageId).classList.add('active');
+
+  // Activer l'onglet correspondant
+  if (evt) {
+    evt.target.classList.add('active');
+  }
+}
 
     // Soumission du formulaire SEA
     document.getElementById('seaForm').addEventListener('submit', function(e) {
@@ -31,8 +33,8 @@
       // Simulation de sauvegarde
       alert('SEA sauvegardé avec succès !');
       
-      // Retourner à l'accueil
-      showPage('accueil');
+       // Retourner à l'accueil␊
+      showPage(null, 'accueil');
       
       // Réactiver l'onglet accueil
       document.querySelector('.nav-tab').classList.add('active');
@@ -229,10 +231,23 @@
       });
     }
 
-    function isValidEmail(email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email);
-    }
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Gestion de la connexion simple
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  document.getElementById('loginPage').style.display = 'none';
+  document.querySelector('header').style.display = '';
+  document.querySelector('nav.nav-tabs').style.display = '';
+  document.querySelector('.content').style.display = '';
+
+  showPage(null, 'accueil');
+  document.querySelector('.nav-tab').classList.add('active');
+});
 
     // Animation d'entrée
     document.addEventListener('DOMContentLoaded', function() {
