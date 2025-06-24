@@ -7,18 +7,21 @@ function showPage(evt, pageId) {
   document.querySelectorAll('.page').forEach(page => {
     page.classList.remove('active');
   });
-      
-      // Désactiver tous les onglets
-      document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      // Afficher la page sélectionnée
-       document.getElementById(pageId).classList.add('active');
+
+  // Désactiver tous les onglets
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+
+  // Afficher la page sélectionnée
+  const page = document.getElementById(pageId);
+  if (page) {
+    page.classList.add('active');
+  }
 
   // Activer l'onglet correspondant
-  if (evt) {
-    evt.target.classList.add('active');
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add('active');
   }
 }
 
@@ -53,12 +56,12 @@ function showPage(evt, pageId) {
       document.body.style.overflow = ''; // Rétablir le scroll
     }
 
-    function confirmDeactivateSEA() {
-      seaActive = false;
-      updateSeaStatus();
-      closeDeactivateModal();
-      alert('SEA désactivé avec succès !');
-    }
+ function confirmDeactivateSEA() {
+  seaActive = false;
+  updateSeaStatus();
+  closeDeactivateModal();
+  alert('SEA désactivé avec succès !');
+}
 
     // Fonction pour mettre à jour l'affichage du statut SEA
     function updateSeaStatus() {
@@ -98,10 +101,51 @@ function showPage(evt, pageId) {
     }
 
     // Fonction pour réactiver le SEA
-    function reactivateSEA() {
+ function reactivateSEA() {
       seaActive = true;
       updateSeaStatus();
       alert('SEA réactivé avec succès !');
+    }
+
+    // Afficher les poches d'épargne depuis localStorage
+    function displayPockets() {
+      const container = document.getElementById('pocketsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+
+      pockets.forEach(pocket => {
+        const card = document.createElement('div');
+        card.className = 'card pocket-card';
+
+        const title = document.createElement('h5');
+        title.textContent = pocket.name;
+
+        const saved = document.createElement('p');
+        saved.textContent = `${pocket.saved}€ / ${pocket.goal}€`;
+
+        const monthly = document.createElement('p');
+        monthly.textContent = `Par mois : ${pocket.monthly}€`;
+
+        const progress = document.createElement('div');
+        progress.className = 'progress';
+        const bar = document.createElement('div');
+        bar.className = 'progress-bar';
+        const percent = pocket.goal ? Math.min(100, (pocket.saved / pocket.goal) * 100) : 0;
+        bar.style.width = percent + '%';
+        progress.appendChild(bar);
+
+        const deadline = document.createElement('p');
+        deadline.textContent = `Échéance : ${pocket.deadline}`;
+
+        card.appendChild(title);
+        card.appendChild(saved);
+        card.appendChild(monthly);
+        card.appendChild(progress);
+        card.appendChild(deadline);
+
+        container.appendChild(card);
+      });
     }
 
     // Fermer la modal en cliquant en dehors
@@ -112,38 +156,38 @@ function showPage(evt, pageId) {
     });
 
     // Fonctions pour les paramètres
-    function resetSEA() {
-      if (confirm('Êtes-vous sûr de vouloir réinitialiser votre SEA ?')) {
-        // Remise à zéro des paramètres du SEA
-        seaActive = false;
+function resetSEA() {
+  if (confirm('Êtes-vous sûr de vouloir réinitialiser votre SEA ?')) {
+    // Nettoyer le stockage local
+    localStorage.removeItem('pockets');
+    localStorage.removeItem('pocketDates');
+    localStorage.removeItem('history');
 
-        document.getElementById('montant').value = 200;
-        document.getElementById('jour').selectedIndex = 0;
-        document.getElementById('compteDepart').selectedIndex = 0;
-        document.getElementById('destination').selectedIndex = 0;
+    // Remise à zéro des paramètres du SEA
+    seaActive = false;
 
-        updateSeaStatus();
+    document.getElementById('montant').value = 200;
+    document.getElementById('jour').selectedIndex = 0;
+    document.getElementById('compteDepart').selectedIndex = 0;
+    document.getElementById('destination').selectedIndex = 0;
 
-        alert('SEA réinitialisé !');
+    updateSeaStatus();
 
-        // Rediriger vers la page de configuration du SEA
-        showPage(null, 'sea');
-        // Activer l'onglet SEA
-        document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.nav-tab')[1].classList.add('active');
-      }
+    // Rafraîchir l'affichage
+    if (typeof renderPockets === 'function') {
+      renderPockets();
+    }
+    if (typeof renderHistory === 'function') {
+      renderHistory();
     }
 
-function logout() {
-  if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-    // Réinitialiser l'interface et revenir à la page de connexion
-    showPage(null, 'accueil');
-    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    alert('SEA réinitialisé !');
 
-    document.getElementById('loginPage').style.display = '';
-    document.querySelector('header').style.display = 'none';
-    document.querySelector('nav.nav-tabs').style.display = 'none';
-    document.querySelector('.content').style.display = 'none';
+    // Rediriger vers la page de configuration du SEA
+    showPage(null, 'sea');
+    // Activer l'onglet SEA
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.nav-tab')[1].classList.add('active');
   }
 }
 
@@ -301,4 +345,21 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
 
       // Initialiser l'état du SEA lors du chargement
       updateSeaStatus();
+      displayPockets();
     });
+
+// Fonctions utilitaires par défaut si absentes
+function renderPockets() {}
+function renderHistory() {}
+
+// Exposer les fonctions globalement pour les gestionnaires inline
+window.showPage = showPage;
+window.showDeactivateModal = showDeactivateModal;
+window.closeDeactivateModal = closeDeactivateModal;
+window.confirmDeactivateSEA = confirmDeactivateSEA;
+window.reactivateSEA = reactivateSEA;
+window.resetSEA = resetSEA;
+window.logout = logout;
+window.toggleUserEdit = toggleUserEdit;
+window.cancelUserEdit = cancelUserEdit;
+window.saveUserInfo = saveUserInfo;
