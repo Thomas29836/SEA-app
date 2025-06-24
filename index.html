@@ -181,6 +181,40 @@
         </form>
       </div>
 
+      <div class="card">
+        <h3 style="margin-bottom:1rem;">Mes poches d'épargne</h3>
+        <div id="pocketsConfigContainer" class="cards-grid"></div>
+        <button id="addPocketBtn" type="button" class="btn btn-primary" style="width:100%;">➕ Ajouter une poche</button>
+      </div>
+
+      <div id="pocketModal" class="modal-overlay">
+        <div class="modal">
+          <h3>Poche d'épargne</h3>
+          <form id="pocketForm">
+            <div class="form-group">
+              <label for="pocketName">Nom</label>
+              <input type="text" id="pocketName" required>
+            </div>
+            <div class="form-group">
+              <label for="pocketGoal">Objectif (€)</label>
+              <input type="number" id="pocketGoal" min="0">
+            </div>
+            <div class="form-group">
+              <label for="pocketMonthly">Montant mensuel (€)</label>
+              <input type="number" id="pocketMonthly" min="0">
+            </div>
+            <div class="form-group">
+              <label for="pocketDeadline">Échéance</label>
+              <input type="date" id="pocketDeadline">
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" onclick="closePocketForm()">Annuler</button>
+              <button type="submit" class="btn btn-primary">Sauvegarder</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Statut du SEA avec bouton de désactivation -->
    <div id="seaStatusCard" class="card" style="background: #fef2f2; border-color: #fecaca;">
         <div style="display: flex; align-items: center; justify-content: space-between;">

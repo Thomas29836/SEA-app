@@ -108,7 +108,7 @@ function showPage(evt, pageId) {
     }
 
     // Afficher les poches d'épargne depuis localStorage
-    function displayPockets() {
+function displayPockets() {
       const container = document.getElementById('pocketsContainer');
       if (!container) return;
       container.innerHTML = '';
@@ -147,6 +147,124 @@ function showPage(evt, pageId) {
         container.appendChild(card);
       });
     }
+
+function renderPockets() {
+  const container = document.getElementById('pocketsConfigContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+
+  pockets.forEach((pocket, index) => {
+    const card = document.createElement('div');
+    card.className = 'card pocket-card';
+
+    const title = document.createElement('h5');
+    title.textContent = pocket.name;
+
+    const saved = document.createElement('p');
+    saved.textContent = `${pocket.saved}€ / ${pocket.goal}€`;
+
+    const monthly = document.createElement('p');
+    monthly.textContent = `Par mois : ${pocket.monthly}€`;
+
+    const progress = document.createElement('div');
+    progress.className = 'progress';
+    const bar = document.createElement('div');
+    bar.className = 'progress-bar';
+    const percent = pocket.goal ? Math.min(100, (pocket.saved / pocket.goal) * 100) : 0;
+    bar.style.width = percent + '%';
+    progress.appendChild(bar);
+
+    const deadline = document.createElement('p');
+    deadline.textContent = `Échéance : ${pocket.deadline || '-'}`;
+
+    const actions = document.createElement('div');
+    actions.style.display = 'flex';
+    actions.style.gap = '0.5rem';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn btn-secondary btn-sm';
+    editBtn.textContent = '✏️';
+    editBtn.onclick = () => openPocketForm(index);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-danger btn-sm';
+    deleteBtn.textContent = '🗑️';
+    deleteBtn.onclick = () => deletePocket(index);
+
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+
+    card.appendChild(title);
+    card.appendChild(saved);
+    card.appendChild(monthly);
+    card.appendChild(progress);
+    card.appendChild(deadline);
+    card.appendChild(actions);
+
+    container.appendChild(card);
+  });
+}
+
+function openPocketForm(index = -1) {
+  const form = document.getElementById('pocketForm');
+  form.dataset.index = index;
+  form.reset();
+
+  if (index > -1) {
+    const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+    const p = pockets[index];
+    if (p) {
+      document.getElementById('pocketName').value = p.name || '';
+      document.getElementById('pocketGoal').value = p.goal || '';
+      document.getElementById('pocketMonthly').value = p.monthly || '';
+      document.getElementById('pocketDeadline').value = p.deadline || '';
+    }
+  }
+
+  document.getElementById('pocketModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePocketForm() {
+  document.getElementById('pocketModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function savePocket(e) {
+  e.preventDefault();
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+  const index = parseInt(e.target.dataset.index, 10);
+
+  const data = {
+    name: document.getElementById('pocketName').value.trim(),
+    goal: parseFloat(document.getElementById('pocketGoal').value) || 0,
+    monthly: parseFloat(document.getElementById('pocketMonthly').value) || 0,
+    deadline: document.getElementById('pocketDeadline').value,
+  };
+
+  if (index >= 0 && pockets[index]) {
+    data.saved = pockets[index].saved || 0;
+    pockets[index] = { ...pockets[index], ...data };
+  } else {
+    data.saved = 0;
+    pockets.push(data);
+  }
+
+  localStorage.setItem('pockets', JSON.stringify(pockets));
+  closePocketForm();
+  displayPockets();
+  renderPockets();
+}
+
+function deletePocket(index) {
+  if (!confirm('Supprimer cette poche ?')) return;
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+  pockets.splice(index, 1);
+  localStorage.setItem('pockets', JSON.stringify(pockets));
+  displayPockets();
+  renderPockets();
+}
 
     // Fermer la modal en cliquant en dehors
     document.getElementById('deactivateModal').addEventListener('click', function(e) {
@@ -336,20 +454,36 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
 });
 
     // Animation d'entrée
-    document.addEventListener('DOMContentLoaded', function() {
-      document.body.style.opacity = '0';
-      setTimeout(() => {
-        document.body.style.transition = 'opacity 0.3s';
-        document.body.style.opacity = '1';
-      }, 100);
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    document.body.style.transition = 'opacity 0.3s';
+    document.body.style.opacity = '1';
+  }, 100);
 
-      // Initialiser l'état du SEA lors du chargement
-      updateSeaStatus();
-      displayPockets();
+  // Initialiser l'état du SEA lors du chargement
+  updateSeaStatus();
+  displayPockets();
+  renderPockets();
+
+  const addBtn = document.getElementById('addPocketBtn');
+  const form = document.getElementById('pocketForm');
+  if (addBtn && form) {
+    addBtn.addEventListener('click', () => openPocketForm());
+    form.addEventListener('submit', savePocket);
+  }
+
+  const modal = document.getElementById('pocketModal');
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closePocketForm();
+      }
     });
+  }
+});
 
 // Fonctions utilitaires par défaut si absentes
-function renderPockets() {}
 function renderHistory() {}
 
 // Exposer les fonctions globalement pour les gestionnaires inline
@@ -363,3 +497,7 @@ window.logout = logout;
 window.toggleUserEdit = toggleUserEdit;
 window.cancelUserEdit = cancelUserEdit;
 window.saveUserInfo = saveUserInfo;
+window.openPocketForm = openPocketForm;
+window.closePocketForm = closePocketForm;
+window.savePocket = savePocket;
+window.deletePocket = deletePocket;

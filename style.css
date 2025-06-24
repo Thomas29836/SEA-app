@@ -313,6 +313,20 @@
   margin-bottom: 0.5rem;
 }
 
+/* SEA configuration pockets */
+#pocketsConfigContainer {
+  margin-bottom: 1rem;
+}
+
+#addPocketBtn {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+#pocketModal .form-group {
+  margin-bottom: 1rem;
+}
+
 .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
