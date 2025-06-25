@@ -25,23 +25,25 @@ function showPage(evt, pageId) {
   }
 }
 
-    // Soumission du formulaire SEA
-    document.getElementById('seaForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Récupérer les données du formulaire
-      const formData = new FormData(this);
-      const data = Object.fromEntries(formData);
-      
-      // Simulation de sauvegarde
-      alert('SEA sauvegardé avec succès !');
-      
-       // Retourner à l'accueil␊
-      showPage(null, 'accueil');
-      
-      // Réactiver l'onglet accueil
-      document.querySelector('.nav-tab').classList.add('active');
-    });
+// Soumission du formulaire SEA (si présent)
+const seaForm = document.getElementById('seaForm');
+if (seaForm) {
+  seaForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+
+    // Simulation de sauvegarde
+    alert('SEA sauvegardé avec succès !');
+
+    // Retourner à l'accueil
+    showPage(null, 'accueil');
+
+    // Réactiver l'onglet accueil
+    document.querySelector('.nav-tab').classList.add('active');
+  });
+}
 
     // Fonctions pour la modal de désactivation
     function showDeactivateModal() {
@@ -218,6 +220,8 @@ function openPocketForm(index = -1) {
       document.getElementById('pocketName').value = p.name || '';
       document.getElementById('pocketGoal').value = p.goal || '';
       document.getElementById('pocketMonthly').value = p.monthly || '';
+      document.getElementById('pocketFrom').value = p.from || '';
+      document.getElementById('pocketTo').value = p.to || '';
       document.getElementById('pocketDeadline').value = p.deadline || '';
     }
   }
@@ -240,6 +244,8 @@ function savePocket(e) {
     name: document.getElementById('pocketName').value.trim(),
     goal: parseFloat(document.getElementById('pocketGoal').value) || 0,
     monthly: parseFloat(document.getElementById('pocketMonthly').value) || 0,
+    from: document.getElementById('pocketFrom').value,
+    to: document.getElementById('pocketTo').value,
     deadline: document.getElementById('pocketDeadline').value,
   };
 
@@ -284,10 +290,15 @@ function resetSEA() {
     // Remise à zéro des paramètres du SEA
     seaActive = false;
 
-    document.getElementById('montant').value = 200;
-    document.getElementById('jour').selectedIndex = 0;
-    document.getElementById('compteDepart').selectedIndex = 0;
-    document.getElementById('destination').selectedIndex = 0;
+    const montant = document.getElementById('montant');
+    const jour = document.getElementById('jour');
+    const depart = document.getElementById('compteDepart');
+    const destination = document.getElementById('destination');
+
+    if (montant) montant.value = 200;
+    if (jour) jour.selectedIndex = 0;
+    if (depart) depart.selectedIndex = 0;
+    if (destination) destination.selectedIndex = 0;
 
     updateSeaStatus();
 
@@ -297,6 +308,9 @@ function resetSEA() {
     }
     if (typeof renderHistory === 'function') {
       renderHistory();
+    }
+    if (typeof displayPockets === 'function') {
+      displayPockets();
     }
 
     alert('SEA réinitialisé !');

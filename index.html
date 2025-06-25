@@ -108,78 +108,7 @@
 
     <!-- Page de configuration SEA -->
     <div id="sea" class="page">
-      <div class="card">
-        <h2 style="margin-bottom: 1.5rem;">Configuration SEA</h2>
-        <form id="seaForm">
-          <div class="form-group">
-            <label for="montant">Montant à épargner chaque mois (€)</label>
-            <input type="number" id="montant" name="montant" value="200" min="1">
-          </div>
-
-          <div class="form-group">
-            <label for="jour">Date de prélèvement souhaitée</label>
-            <select id="jour" name="prelevement_day">
-              <option value="">-- Choisissez un jour --</option>
-              <option value="1">01 du mois</option>
-              <option value="2">02 du mois</option>
-              <option value="3">03 du mois</option>
-              <option value="4">04 du mois</option>
-              <option value="5" selected>05 du mois</option>
-              <option value="6">06 du mois</option>
-              <option value="7">07 du mois</option>
-              <option value="8">08 du mois</option>
-              <option value="9">09 du mois</option>
-              <option value="10">10 du mois</option>
-              <option value="11">11 du mois</option>
-              <option value="12">12 du mois</option>
-              <option value="13">13 du mois</option>
-              <option value="14">14 du mois</option>
-              <option value="15">15 du mois</option>
-              <option value="16">16 du mois</option>
-              <option value="17">17 du mois</option>
-              <option value="18">18 du mois</option>
-              <option value="19">19 du mois</option>
-              <option value="20">20 du mois</option>
-              <option value="21">21 du mois</option>
-              <option value="22">22 du mois</option>
-              <option value="23">23 du mois</option>
-              <option value="24">24 du mois</option>
-              <option value="25">25 du mois</option>
-              <option value="26">26 du mois</option>
-              <option value="27">27 du mois</option>
-              <option value="28">28 du mois</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="compteDepart">Compte de départ</label>
-            <select id="compteDepart" name="compteDepart">
-              <option value="">--Choisissez le Compte à Prélever--</option>
-              <option value="compteCourant">Compte Courant</option>
-              </select>
-          </div>
-
-          <div class="form-group">
-            <label for="destination">Compte de Destination</label>
-            <select id="destination" name="destination">
-              <option value="">--Choisissez le Compte à remplir--</option>
-              <option value="livretA">Livret A</option>
-              <option value="ldds">LDDS</option>
-              <option value="pea">PEA</option>
-              <option value="cto">CTO</option>
-              </select>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" onclick="showPage(event, 'accueil')">
-              Annuler
-            </button>
-            <button type="submit" class="btn btn-primary">
-              Sauvegarder
-            </button>
-          </div>
-        </form>
-      </div>
+      <!-- Ancien formulaire de configuration SEA supprimé -->
 
       <div class="card">
         <h3 style="margin-bottom:1rem;">Mes poches d'épargne</h3>
@@ -202,6 +131,23 @@
             <div class="form-group">
               <label for="pocketMonthly">Montant mensuel (€)</label>
               <input type="number" id="pocketMonthly" min="0">
+            </div>
+            <div class="form-group">
+              <label for="pocketFrom">Compte à prélever</label>
+              <select id="pocketFrom">
+                <option value="">--Choisissez un compte--</option>
+                <option value="compteCourant">Compte Courant</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pocketTo">Compte destinataire</label>
+              <select id="pocketTo">
+                <option value="">--Choisissez le compte destinataire--</option>
+                <option value="livretA">Livret A</option>
+                <option value="ldds">LDDS</option>
+                <option value="pea">PEA</option>
+                <option value="cto">CTO</option>
+              </select>
             </div>
             <div class="form-group">
               <label for="pocketDeadline">Échéance</label>
@@ -235,50 +181,6 @@
     <!-- Historique des virements -->
     <div id="historique" class="page">
       <h2 style="margin-bottom: 1.5rem;">Historique des virements</h2>
-      
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Mois</th>
-              <th>Montant</th>
-              <th>Statut</th>
-              <th>Date prévue</th>
-              <th>Date confirmée</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Juin</td>
-              <td>200€</td>
-              <td class="status-confirmed">✅ Confirmé</td>
-              <td>05/06</td>
-              <td>05/06</td>
-            </tr>
-            <tr>
-              <td>Mai</td>
-              <td>200€</td>
-              <td class="status-pending">❌ Non confirmé</td>
-              <td>05/05</td>
-              <td>–</td>
-            </tr>
-            <tr>
-              <td>Avril</td>
-              <td>150€</td>
-              <td class="status-confirmed">✅ Confirmé</td>
-              <td>05/04</td>
-              <td>05/04</td>
-            </tr>
-            <tr>
-              <td>Mars</td>
-              <td>200€</td>
-              <td class="status-confirmed">✅ Confirmé</td>
-              <td>05/03</td>
-              <td>05/03</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
     <!-- Page Paramètres -->
