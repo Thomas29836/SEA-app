@@ -123,12 +123,11 @@ function displayPockets() {
         const title = document.createElement('h5');
         title.textContent = pocket.name;
 
-        const saved = document.createElement('p');
-        saved.textContent = `${pocket.saved}€ / ${pocket.goal}€`;
-
         const monthly = document.createElement('p');
         monthly.textContent = `Par mois : ${pocket.monthly}€`;
 
+        const progressWrapper = document.createElement('div');
+        progressWrapper.className = 'progress-wrapper';
         const progress = document.createElement('div');
         progress.className = 'progress';
         const bar = document.createElement('div');
@@ -136,14 +135,22 @@ function displayPockets() {
         const percent = pocket.goal ? Math.min(100, (pocket.saved / pocket.goal) * 100) : 0;
         bar.style.width = percent + '%';
         progress.appendChild(bar);
+        const percentLabel = document.createElement('span');
+        percentLabel.className = 'progress-percent';
+        percentLabel.textContent = percent.toFixed(0) + '%';
+        progressWrapper.appendChild(progress);
+        progressWrapper.appendChild(percentLabel);
+
+        const saved = document.createElement('p');
+        saved.textContent = `${pocket.saved}€ / ${pocket.goal}€`;
 
         const deadline = document.createElement('p');
         deadline.textContent = `Échéance : ${pocket.deadline}`;
 
         card.appendChild(title);
-        card.appendChild(saved);
         card.appendChild(monthly);
-        card.appendChild(progress);
+        card.appendChild(progressWrapper);
+        card.appendChild(saved);
         card.appendChild(deadline);
 
         container.appendChild(card);
@@ -163,12 +170,11 @@ function renderPockets() {
     const title = document.createElement('h5');
     title.textContent = pocket.name;
 
-    const saved = document.createElement('p');
-    saved.textContent = `${pocket.saved}€ / ${pocket.goal}€`;
-
     const monthly = document.createElement('p');
     monthly.textContent = `Par mois : ${pocket.monthly}€`;
 
+    const progressWrapper = document.createElement('div');
+    progressWrapper.className = 'progress-wrapper';
     const progress = document.createElement('div');
     progress.className = 'progress';
     const bar = document.createElement('div');
@@ -176,6 +182,14 @@ function renderPockets() {
     const percent = pocket.goal ? Math.min(100, (pocket.saved / pocket.goal) * 100) : 0;
     bar.style.width = percent + '%';
     progress.appendChild(bar);
+    const percentLabel = document.createElement('span');
+    percentLabel.className = 'progress-percent';
+    percentLabel.textContent = percent.toFixed(0) + '%';
+    progressWrapper.appendChild(progress);
+    progressWrapper.appendChild(percentLabel);
+
+    const saved = document.createElement('p');
+    saved.textContent = `${pocket.saved}€ / ${pocket.goal}€`;
 
     const deadline = document.createElement('p');
     deadline.textContent = `Échéance : ${pocket.deadline || '-'}`;
@@ -198,9 +212,9 @@ function renderPockets() {
     actions.appendChild(deleteBtn);
 
     card.appendChild(title);
-    card.appendChild(saved);
     card.appendChild(monthly);
-    card.appendChild(progress);
+    card.appendChild(progressWrapper);
+    card.appendChild(saved);
     card.appendChild(deadline);
     card.appendChild(actions);
 
@@ -270,6 +284,37 @@ function deletePocket(index) {
   localStorage.setItem('pockets', JSON.stringify(pockets));
   displayPockets();
   renderPockets();
+}
+
+// Calcul automatique du montant mensuel
+function calculateMonthly() {
+  const goal = parseFloat(document.getElementById('pocketGoal').value) || 0;
+  const deadlineStr = document.getElementById('pocketDeadline').value;
+
+  if (!goal || !deadlineStr) {
+    alert("Veuillez d'abord saisir un objectif et une échéance");
+    return;
+  }
+
+  const deadline = new Date(deadlineStr);
+  const today = new Date();
+
+  let months =
+    (deadline.getFullYear() - today.getFullYear()) * 12 +
+    (deadline.getMonth() - today.getMonth()) +
+    1;
+
+  if (months <= 0) {
+    months = 1;
+  }
+
+  const monthly = Math.ceil(goal / months);
+  document.getElementById('pocketMonthly').value = monthly;
+}
+
+// Remplir automatiquement le nom de la poche
+function setPocketName(name) {
+  document.getElementById('pocketName').value = name;
 }
 
     // Fermer la modal en cliquant en dehors
@@ -515,3 +560,5 @@ window.openPocketForm = openPocketForm;
 window.closePocketForm = closePocketForm;
 window.savePocket = savePocket;
 window.deletePocket = deletePocket;
+window.calculateMonthly = calculateMonthly;
+window.setPocketName = setPocketName;

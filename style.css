@@ -327,6 +327,31 @@
   margin-bottom: 1rem;
 }
 
+/* Suggestions de poches */
+.pocket-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.pocket-suggestions button {
+  flex: 1 0 45%;
+}
+
+/* Progress display inside pocket cards */
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progress-percent {
+  font-size: 0.8rem;
+  color: #475569;
+  white-space: nowrap;
+}
+
 .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;

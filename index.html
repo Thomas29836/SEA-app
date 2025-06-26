@@ -119,6 +119,18 @@
       <div id="pocketModal" class="modal-overlay">
         <div class="modal">
           <h3>Poche d'épargne</h3>
+          <div class="pocket-suggestions">
+            <button type="button" onclick="setPocketName('🏖️ Vacances')">🏖️ Vacances</button>
+            <button type="button" onclick="setPocketName('🚗 Voiture')">🚗 Voiture</button>
+            <button type="button" onclick="setPocketName('🏠 Maison')">🏠 Maison</button>
+            <button type="button" onclick="setPocketName('📚 Éducation')">📚 Éducation</button>
+            <button type="button" onclick="setPocketName('⚕️ Santé')">⚕️ Santé</button>
+            <button type="button" onclick="setPocketName('🎮 Loisirs')">🎮 Loisirs</button>
+            <button type="button" onclick="setPocketName('🛍️ Shopping')">🛍️ Shopping</button>
+            <button type="button" onclick="setPocketName('🎁 Cadeaux')">🎁 Cadeaux</button>
+            <button type="button" onclick="setPocketName('💡 Autre')">💡 Autre</button>
+            <button type="button" onclick="setPocketName('💰 Default')">💰 Default</button>
+          </div>
           <form id="pocketForm">
             <div class="form-group">
               <label for="pocketName">Nom</label>
@@ -129,8 +141,15 @@
               <input type="number" id="pocketGoal" min="0">
             </div>
             <div class="form-group">
+              <label for="pocketDeadline">Échéance</label>
+              <input type="date" id="pocketDeadline">
+            </div>
+            <div class="form-group">
               <label for="pocketMonthly">Montant mensuel (€)</label>
-              <input type="number" id="pocketMonthly" min="0">
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="number" id="pocketMonthly" min="0" style="flex: 1;">
+                <button type="button" class="btn btn-secondary" onclick="calculateMonthly()">Calculer</button>
+              </div>
             </div>
             <div class="form-group">
               <label for="pocketFrom">Compte à prélever</label>
@@ -148,10 +167,6 @@
                 <option value="pea">PEA</option>
                 <option value="cto">CTO</option>
               </select>
-            </div>
-            <div class="form-group">
-              <label for="pocketDeadline">Échéance</label>
-              <input type="date" id="pocketDeadline">
             </div>
             <div class="form-actions">
               <button type="button" class="btn btn-secondary" onclick="closePocketForm()">Annuler</button>
