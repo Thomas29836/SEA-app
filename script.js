@@ -1,6 +1,16 @@
  // Variable pour suivre l'état du SEA
     let seaActive = false;
 
+// Format date as DD/MM/YYYY
+function formatDateDisplay(dateStr) {
+  if (!dateStr) return '-';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return dateStr;
+}
+
     // Navigation entre les pages
 function showPage(evt, pageId) {
   // Masquer toutes les pages
@@ -121,10 +131,11 @@ function displayPockets() {
         card.className = 'card pocket-card';
 
         const title = document.createElement('h5');
+        title.className = 'pocket-title';
         title.textContent = pocket.name;
 
         const monthly = document.createElement('p');
-        monthly.textContent = `Par mois : ${pocket.monthly}€`;
+        monthly.textContent = `${pocket.monthly}€/mois`;
 
         const progressWrapper = document.createElement('div');
         progressWrapper.className = 'progress-wrapper';
@@ -141,16 +152,38 @@ function displayPockets() {
         progressWrapper.appendChild(progress);
         progressWrapper.appendChild(percentLabel);
 
-        const saved = document.createElement('p');
-        saved.textContent = `${pocket.saved}€ / ${pocket.goal}€`;
+        const amountsRow = document.createElement('div');
+        amountsRow.className = 'amounts-row';
+
+        const savedCol = document.createElement('div');
+        const savedLabel = document.createElement('p');
+        savedLabel.textContent = 'Épargné';
+        const savedAmount = document.createElement('p');
+        savedAmount.className = 'saved-amount';
+        savedAmount.textContent = `${pocket.saved}€`;
+        savedCol.appendChild(savedLabel);
+        savedCol.appendChild(savedAmount);
+
+        const goalCol = document.createElement('div');
+        const goalLabel = document.createElement('p');
+        goalLabel.textContent = 'Objectif';
+        const goalAmount = document.createElement('p');
+        goalAmount.className = 'goal-amount';
+        goalAmount.textContent = `${pocket.goal}€`;
+        goalCol.appendChild(goalLabel);
+        goalCol.appendChild(goalAmount);
+
+        amountsRow.appendChild(savedCol);
+        amountsRow.appendChild(goalCol);
 
         const deadline = document.createElement('p');
-        deadline.textContent = `Échéance : ${pocket.deadline}`;
+        deadline.className = 'deadline';
+        deadline.textContent = `Échéance : ${formatDateDisplay(pocket.deadline)}`;
 
         card.appendChild(title);
         card.appendChild(monthly);
         card.appendChild(progressWrapper);
-        card.appendChild(saved);
+        card.appendChild(amountsRow);
         card.appendChild(deadline);
 
         container.appendChild(card);
@@ -168,10 +201,11 @@ function renderPockets() {
     card.className = 'card pocket-card';
 
     const title = document.createElement('h5');
+    title.className = 'pocket-title';
     title.textContent = pocket.name;
 
     const monthly = document.createElement('p');
-    monthly.textContent = `Par mois : ${pocket.monthly}€`;
+    monthly.textContent = `${pocket.monthly}€/mois`;
 
     const progressWrapper = document.createElement('div');
     progressWrapper.className = 'progress-wrapper';
@@ -188,11 +222,33 @@ function renderPockets() {
     progressWrapper.appendChild(progress);
     progressWrapper.appendChild(percentLabel);
 
-    const saved = document.createElement('p');
-    saved.textContent = `${pocket.saved}€ / ${pocket.goal}€`;
+    const amountsRow = document.createElement('div');
+    amountsRow.className = 'amounts-row';
+
+    const savedCol = document.createElement('div');
+    const savedLabel = document.createElement('p');
+    savedLabel.textContent = 'Épargné';
+    const savedAmount = document.createElement('p');
+    savedAmount.className = 'saved-amount';
+    savedAmount.textContent = `${pocket.saved}€`;
+    savedCol.appendChild(savedLabel);
+    savedCol.appendChild(savedAmount);
+
+    const goalCol = document.createElement('div');
+    const goalLabel = document.createElement('p');
+    goalLabel.textContent = 'Objectif';
+    const goalAmount = document.createElement('p');
+    goalAmount.className = 'goal-amount';
+    goalAmount.textContent = `${pocket.goal}€`;
+    goalCol.appendChild(goalLabel);
+    goalCol.appendChild(goalAmount);
+
+    amountsRow.appendChild(savedCol);
+    amountsRow.appendChild(goalCol);
 
     const deadline = document.createElement('p');
-    deadline.textContent = `Échéance : ${pocket.deadline || '-'}`;
+    deadline.className = 'deadline';
+    deadline.textContent = `Échéance : ${formatDateDisplay(pocket.deadline)}`;
 
     const actions = document.createElement('div');
     actions.style.display = 'flex';
@@ -214,7 +270,7 @@ function renderPockets() {
     card.appendChild(title);
     card.appendChild(monthly);
     card.appendChild(progressWrapper);
-    card.appendChild(saved);
+    card.appendChild(amountsRow);
     card.appendChild(deadline);
     card.appendChild(actions);
 

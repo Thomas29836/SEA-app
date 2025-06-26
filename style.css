@@ -142,7 +142,7 @@
     /* Grid for pockets */
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
       gap: 1rem;
       margin-bottom: 1rem;
     }
@@ -153,12 +153,14 @@
       border-radius: 9999px;
       overflow: hidden;
       margin: 0.5rem 0;
+      flex: 1;
     }
 
     .pocket-card .progress-bar {
       height: 100%;
       background: #3b82f6;
       width: 0;
+      transition: width 0.3s ease;
     }
 
     /* Buttons */
@@ -301,16 +303,39 @@
   overflow: hidden;
   height: 10px;
   margin: 0.5rem 0;
+  flex: 1;
 }
 
 .progress-inner {
   background: #3b82f6;
   height: 100%;
   width: 0;
+  transition: width 0.3s ease;
 }
 
 .pocket-card h3 {
   margin-bottom: 0.5rem;
+}
+
+.pocket-card h5 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.pocket-card .saved-amount,
+.pocket-card .goal-amount {
+  font-weight: 700;
+}
+
+.pocket-card .amounts-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+}
+
+.pocket-card .deadline {
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
 /* SEA configuration pockets */
