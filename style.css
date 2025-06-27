@@ -152,11 +152,40 @@
     }
 
     /* Grid for pocket detail view */
-    .detail-grid {
+.detail-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 1rem;
       margin-bottom: 1rem;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 1rem;
+      color: #475569;
+    }
+
+    .icon-btn:hover {
+      color: #1e293b;
+    }
+
+    .icon-btn.delete {
+      color: #dc2626;
     }
 
     /* Make bank accounts card span full width */

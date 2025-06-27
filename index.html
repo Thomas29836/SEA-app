@@ -256,7 +256,13 @@
     <!-- Détail d'une poche d'épargne -->
     <div id="pocketDetail" class="page">
       <button type="button" class="btn btn-secondary" id="detailBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
-      <h3 id="detailName" style="margin-bottom:1rem;"></h3>
+      <div class="detail-header">
+        <h3 id="detailName"></h3>
+        <div class="detail-actions">
+          <button type="button" id="detailEditBtn" class="icon-btn" title="Modifier">✏️</button>
+          <button type="button" id="detailDeleteBtn" class="icon-btn delete" title="Supprimer">🗑️</button>
+        </div>
+      </div>
       <div id="detailCards" class="detail-grid">
         <div class="card">
           <h4>Montant épargné</h4>
@@ -284,10 +290,6 @@
           <p>Prélèvement : <span id="detailFrom"></span></p>
           <p>Destinataire : <span id="detailTo"></span></p>
         </div>
-      </div>
-      <div class="form-actions" style="margin-top: 1rem;">
-        <button type="button" class="btn btn-secondary" id="detailEditBtn">Modifier</button>
-        <button type="button" class="btn btn-danger" id="detailDeleteBtn">Supprimer</button>
       </div>
     </div>
 
