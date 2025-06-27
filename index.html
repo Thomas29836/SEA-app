@@ -66,6 +66,7 @@
 <div class="content" style="display:none;">
     <!-- Page d'accueil/tableau de bord SEA -->
     <div id="accueil" class="page active">
+      <a href="#" id="settingsShortcut" class="settings-icon" onclick="goToSettings()" title="Paramètres">⚙️</a>
       <div class="stats-grid">
         <div class="stat-card">
           <h5>Total épargné</h5>
@@ -76,6 +77,13 @@
           <h5>Épargne Mensuelle</h5>
           <p id="totalMonthlyAmount">0€/mois</p>
           <p class="subtext">automatique chaque mois</p>
+        </div>
+        <div class="stat-card">
+          <h5>Progression globale</h5>
+          <p><strong id="overallProgressPercent">0%</strong></p>
+          <div class="progress">
+            <div class="progress-bar" id="overallProgressBar"></div>
+          </div>
         </div>
       </div>
 
@@ -90,8 +98,9 @@
 
     </div>
 
-    <!-- Page Paramètres -->
+  <!-- Page Paramètres -->
  <div id="parametres" class="page">
+      <button type="button" class="btn btn-secondary" id="settingsBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
       <h2 style="margin-bottom: 1.5rem;">Paramètres</h2>
 
       <div class="card">

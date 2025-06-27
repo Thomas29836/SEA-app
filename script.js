@@ -33,9 +33,14 @@ function updateTotals() {
   const savedEl = document.getElementById('totalSavedAmount');
   const goalsEl = document.getElementById('totalGoalsAmount');
   const monthlyEl = document.getElementById('totalMonthlyAmount');
+  const progressEl = document.getElementById('overallProgressPercent');
+  const progressBarEl = document.getElementById('overallProgressBar');
   if (savedEl) savedEl.textContent = `${totalSaved}€`;
   if (goalsEl) goalsEl.textContent = `sur ${totalGoals}€ d'objectifs`;
   if (monthlyEl) monthlyEl.textContent = `${totalMonthly}€/mois`;
+  const percent = totalGoals ? Math.min(100, (totalSaved / totalGoals) * 100) : 0;
+  if (progressEl) progressEl.textContent = percent.toFixed(0) + '%';
+  if (progressBarEl) progressBarEl.style.width = percent + '%';
 }
 
     // Navigation entre les pages
@@ -678,6 +683,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const editDetailBtn = document.getElementById('detailEditBtn');
   const deleteDetailBtn = document.getElementById('detailDeleteBtn');
   const backDetailBtn = document.getElementById('detailBackBtn');
+  const settingsBackBtn = document.getElementById('settingsBackBtn');
   if (editDetailBtn) {
     editDetailBtn.addEventListener('click', () => openPocketForm(currentPocketIndex));
   }
@@ -686,6 +692,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   if (backDetailBtn) {
     backDetailBtn.addEventListener('click', () => showPage(null, 'accueil'));
+  }
+  if (settingsBackBtn) {
+    settingsBackBtn.addEventListener('click', () => {
+      showPage(null, 'accueil');
+      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.nav-tab')[0].classList.add('active');
+    });
   }
 
   const modal = document.getElementById('pocketModal');
@@ -704,6 +717,14 @@ function renderHistory() {}
 // Stub for refreshing bank accounts
 function updateBankAccounts() {
   alert('Mise à jour des comptes bancaires...');
+}
+
+// Navigate to the settings page from the shortcut icon
+function goToSettings() {
+  showPage(null, 'parametres');
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+  const tabs = document.querySelectorAll('.nav-tab');
+  if (tabs[1]) tabs[1].classList.add('active');
 }
 
 // Exposer les fonctions globalement pour les gestionnaires inline
@@ -725,3 +746,4 @@ window.calculateMonthly = calculateMonthly;
 window.setPocketName = setPocketName;
 window.showPocketDetail = showPocketDetail;
 window.updateBankAccounts = updateBankAccounts;
+window.goToSettings = goToSettings;
