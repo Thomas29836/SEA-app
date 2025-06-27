@@ -147,16 +147,24 @@
       margin-bottom: 1rem;
     }
 
-    .pocket-card .progress {
-      height: 0.5rem;
-      background: #e5e7eb;
-      border-radius: 9999px;
-      overflow: hidden;
-      margin: 0.5rem 0;
-      flex: 1;
+    .pocket-card {
+      cursor: pointer;
     }
 
-    .pocket-card .progress-bar {
+    /* Grid for pocket detail view */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Make bank accounts card span full width */
+    .bank-card {
+      grid-column: 1 / -1;
+    }
+
+    .pocket-card .progress {
       height: 100%;
       background: #3b82f6;
       width: 0;

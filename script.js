@@ -1,5 +1,6 @@
  // Variable pour suivre l'état du SEA
     let seaActive = false;
+    let currentPocketIndex = -1;
 
 // Format date as DD/MM/YYYY
 function formatDateDisplay(dateStr) {
@@ -9,6 +10,19 @@ function formatDateDisplay(dateStr) {
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
   }
   return dateStr;
+}
+
+// Calculate remaining months until the given date
+function monthsUntil(dateStr) {
+  if (!dateStr) return 0;
+  const target = new Date(dateStr);
+  const today = new Date();
+  let months = (target.getFullYear() - today.getFullYear()) * 12 +
+               (target.getMonth() - today.getMonth());
+  if (target.getDate() > today.getDate()) {
+    months += 1;
+  }
+  return months < 0 ? 0 : months;
 }
 
     // Navigation entre les pages
@@ -126,9 +140,10 @@ function displayPockets() {
       container.innerHTML = '';
       const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
 
-      pockets.forEach(pocket => {
-        const card = document.createElement('div');
-        card.className = 'card pocket-card';
+        pockets.forEach((pocket, index) => {
+          const card = document.createElement('div');
+          card.className = 'card pocket-card';
+          card.addEventListener('click', () => showPocketDetail(index));
 
         const title = document.createElement('h5');
         title.className = 'pocket-title';
@@ -189,6 +204,27 @@ function displayPockets() {
         container.appendChild(card);
       });
     }
+
+function showPocketDetail(index) {
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+  const pocket = pockets[index];
+  if (!pocket) return;
+  currentPocketIndex = index;
+  document.getElementById('detailName').textContent = pocket.name;
+  document.getElementById('detailSaved').textContent = pocket.saved + '€';
+  document.getElementById('detailGoal').textContent = pocket.goal + '€';
+  const remaining = Math.max(0, (pocket.goal || 0) - (pocket.saved || 0));
+  document.getElementById('detailRemaining').textContent = remaining > 0 ? `${remaining}€ restants` : 'Objectif atteint';
+  document.getElementById('detailDeadline').textContent = formatDateDisplay(pocket.deadline);
+  const monthsLeft = monthsUntil(pocket.deadline);
+  document.getElementById('detailMonthsLeft').textContent = monthsLeft > 0 ? `${monthsLeft} mois restants` : 'Échéance atteinte';
+  const percent = pocket.goal ? Math.min(100, (pocket.saved / pocket.goal) * 100) : 0;
+  document.getElementById('detailProgressBar').style.width = percent + '%';
+  document.getElementById('detailProgressPercent').textContent = percent.toFixed(0) + '%';
+  document.getElementById('detailFrom').textContent = pocket.from || '-';
+  document.getElementById('detailTo').textContent = pocket.to || '-';
+  showPage(null, 'pocketDetail');
+}
 
 function renderPockets() {
   const container = document.getElementById('pocketsConfigContainer');
@@ -331,6 +367,13 @@ function savePocket(e) {
   closePocketForm();
   displayPockets();
   renderPockets();
+  if (
+    document.getElementById('pocketDetail') &&
+    document.getElementById('pocketDetail').classList.contains('active')
+  ) {
+    const idx = index >= 0 ? index : pockets.length - 1;
+    showPocketDetail(idx);
+  }
 }
 
 function deletePocket(index) {
@@ -340,6 +383,10 @@ function deletePocket(index) {
   localStorage.setItem('pockets', JSON.stringify(pockets));
   displayPockets();
   renderPockets();
+  if (document.getElementById('pocketDetail') &&
+      document.getElementById('pocketDetail').classList.contains('active')) {
+    showPage(null, 'accueil');
+  }
 }
 
 // Calcul automatique du montant mensuel
@@ -588,6 +635,19 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', savePocket);
   }
 
+  const editDetailBtn = document.getElementById('detailEditBtn');
+  const deleteDetailBtn = document.getElementById('detailDeleteBtn');
+  const backDetailBtn = document.getElementById('detailBackBtn');
+  if (editDetailBtn) {
+    editDetailBtn.addEventListener('click', () => openPocketForm(currentPocketIndex));
+  }
+  if (deleteDetailBtn) {
+    deleteDetailBtn.addEventListener('click', () => deletePocket(currentPocketIndex));
+  }
+  if (backDetailBtn) {
+    backDetailBtn.addEventListener('click', () => showPage(null, 'accueil'));
+  }
+
   const modal = document.getElementById('pocketModal');
   if (modal) {
     modal.addEventListener('click', function(e) {
@@ -618,3 +678,4 @@ window.savePocket = savePocket;
 window.deletePocket = deletePocket;
 window.calculateMonthly = calculateMonthly;
 window.setPocketName = setPocketName;
+window.showPocketDetail = showPocketDetail;

@@ -253,6 +253,44 @@
     </div>
   </div>
 
+    <!-- Détail d'une poche d'épargne -->
+    <div id="pocketDetail" class="page">
+      <button type="button" class="btn btn-secondary" id="detailBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
+      <h3 id="detailName" style="margin-bottom:1rem;"></h3>
+      <div id="detailCards" class="detail-grid">
+        <div class="card">
+          <h4>Montant épargné</h4>
+          <p><strong id="detailSaved"></strong></p>
+        </div>
+        <div class="card">
+          <h4>Objectif</h4>
+          <p><strong id="detailGoal"></strong></p>
+          <p id="detailRemaining" class="warning"></p>
+        </div>
+        <div class="card">
+          <h4>Échéance</h4>
+          <p id="detailDeadline"></p>
+          <p id="detailMonthsLeft"></p>
+        </div>
+        <div class="card">
+          <h4>Statut</h4>
+          <div class="progress">
+            <div class="progress-bar" id="detailProgressBar"></div>
+          </div>
+          <p id="detailProgressPercent"></p>
+        </div>
+        <div class="card">
+          <h4>Comptes bancaires</h4>
+          <p>Prélèvement : <span id="detailFrom"></span></p>
+          <p>Destinataire : <span id="detailTo"></span></p>
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top: 1rem;">
+        <button type="button" class="btn btn-secondary" id="detailEditBtn">Modifier</button>
+        <button type="button" class="btn btn-danger" id="detailDeleteBtn">Supprimer</button>
+      </div>
+    </div>
+
   <!-- Modal de confirmation pour désactivation -->
   <div id="deactivateModal" class="modal-overlay">
     <div class="modal">
