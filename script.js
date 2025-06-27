@@ -25,6 +25,19 @@ function monthsUntil(dateStr) {
   return months < 0 ? 0 : months;
 }
 
+function updateTotals() {
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+  const totalSaved = pockets.reduce((sum, p) => sum + (p.saved || 0), 0);
+  const totalGoals = pockets.reduce((sum, p) => sum + (p.goal || 0), 0);
+  const totalMonthly = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+  const savedEl = document.getElementById('totalSavedAmount');
+  const goalsEl = document.getElementById('totalGoalsAmount');
+  const monthlyEl = document.getElementById('totalMonthlyAmount');
+  if (savedEl) savedEl.textContent = `${totalSaved}€`;
+  if (goalsEl) goalsEl.textContent = `sur ${totalGoals}€ d'objectifs`;
+  if (monthlyEl) monthlyEl.textContent = `${totalMonthly}€/mois`;
+}
+
     // Navigation entre les pages
 function showPage(evt, pageId) {
   // Masquer toutes les pages
@@ -206,9 +219,11 @@ function displayPockets() {
         card.appendChild(amountsRow);
         card.appendChild(deadline);
 
-        container.appendChild(card);
-      });
-    }
+      container.appendChild(card);
+    });
+
+  updateTotals();
+}
 
 function showPocketDetail(index) {
   const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
@@ -324,6 +339,10 @@ function openPocketForm(index = -1) {
   form.dataset.index = index;
   form.reset();
 
+  // Stocker la page de retour apres sauvegarde
+  const detailActive = document.getElementById('pocketDetail')?.classList.contains('active');
+  form.dataset.returnTo = detailActive ? 'detail' : 'home';
+
   if (index > -1) {
     const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
     const p = pockets[index];
@@ -351,6 +370,8 @@ function savePocket(e) {
   const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   const index = parseInt(e.target.dataset.index, 10);
 
+  const returnTo = e.target.dataset.returnTo || 'home';
+
   const data = {
     name: document.getElementById('pocketName').value.trim(),
     goal: parseFloat(document.getElementById('pocketGoal').value) || 0,
@@ -372,9 +393,13 @@ function savePocket(e) {
   closePocketForm();
   displayPockets();
   renderPockets();
-  showPage(null, 'accueil');
-  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-  document.querySelector('.nav-tab').classList.add('active');
+  if (returnTo === 'detail' && index >= 0) {
+    showPocketDetail(index);
+  } else {
+    showPage(null, 'accueil');
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelector('.nav-tab').classList.add('active');
+  }
 }
 
 function deletePocket(index) {
@@ -633,8 +658,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const addBtn = document.getElementById('addPocketBtn');
   const form = document.getElementById('pocketForm');
-  if (addBtn && form) {
+  if (addBtn) {
     addBtn.addEventListener('click', () => openPocketForm());
+  }
+  if (form) {
     form.addEventListener('submit', savePocket);
   }
 
