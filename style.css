@@ -234,9 +234,22 @@
       color: white;
     }
 
-    .btn-danger:hover {
-      background: #b91c1c;
-    }
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* Header section inside pages */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
 
     /* Forms */
     .form-group {

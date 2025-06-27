@@ -95,15 +95,15 @@
         </div>
       </div>
 
-      <h4>Mes poches d'épargne</h4>
+      <div class="section-header">
+        <h4>Mes poches d'épargne</h4>
+        <div class="header-actions">
+          <button id="refreshAccountsBtn" class="btn btn-secondary">Comptes bancaires</button>
+          <button id="homeAddPocketBtn" class="btn btn-primary">➕ Ajouter une poche</button>
+        </div>
+      </div>
       <div id="pocketsContainer" class="cards-grid"></div>
 
-      <div class="card">
-        <h4 style="margin-bottom: 1rem;">Actions rapides</h4>
-         <button class="btn btn-primary" onclick="showPage(event, 'sea')" style="width: 100%;">
-          ✏️ Modifier mon SEA
-        </button>
-      </div>
     </div>
 
     <!-- Page de configuration SEA -->
@@ -116,65 +116,6 @@
         <button id="addPocketBtn" type="button" class="btn btn-primary" style="width:100%;">➕ Ajouter une poche</button>
       </div>
 
-      <div id="pocketModal" class="modal-overlay">
-        <div class="modal">
-          <h3>Poche d'épargne</h3>
-          <div class="pocket-suggestions">
-            <button type="button" onclick="setPocketName('🏖️ Vacances')">🏖️ Vacances</button>
-            <button type="button" onclick="setPocketName('🚗 Voiture')">🚗 Voiture</button>
-            <button type="button" onclick="setPocketName('🏠 Maison')">🏠 Maison</button>
-            <button type="button" onclick="setPocketName('📚 Éducation')">📚 Éducation</button>
-            <button type="button" onclick="setPocketName('⚕️ Santé')">⚕️ Santé</button>
-            <button type="button" onclick="setPocketName('🎮 Loisirs')">🎮 Loisirs</button>
-            <button type="button" onclick="setPocketName('🛍️ Shopping')">🛍️ Shopping</button>
-            <button type="button" onclick="setPocketName('🎁 Cadeaux')">🎁 Cadeaux</button>
-            <button type="button" onclick="setPocketName('💡 Autre')">💡 Autre</button>
-            <button type="button" onclick="setPocketName('💰 Default')">💰 Default</button>
-          </div>
-          <form id="pocketForm">
-            <div class="form-group">
-              <label for="pocketName">Nom</label>
-              <input type="text" id="pocketName" required>
-            </div>
-            <div class="form-group">
-              <label for="pocketGoal">Objectif (€)</label>
-              <input type="number" id="pocketGoal" min="0">
-            </div>
-            <div class="form-group">
-              <label for="pocketDeadline">Échéance</label>
-              <input type="date" id="pocketDeadline">
-            </div>
-            <div class="form-group">
-              <label for="pocketMonthly">Montant mensuel (€)</label>
-              <div style="display: flex; gap: 0.5rem;">
-                <input type="number" id="pocketMonthly" min="0" style="flex: 1;">
-                <button type="button" class="btn btn-secondary" onclick="calculateMonthly()">Calculer</button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="pocketFrom">Compte à prélever</label>
-              <select id="pocketFrom">
-                <option value="">--Choisissez un compte--</option>
-                <option value="compteCourant">Compte Courant</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="pocketTo">Compte destinataire</label>
-              <select id="pocketTo">
-                <option value="">--Choisissez le compte destinataire--</option>
-                <option value="livretA">Livret A</option>
-                <option value="ldds">LDDS</option>
-                <option value="pea">PEA</option>
-                <option value="cto">CTO</option>
-              </select>
-            </div>
-            <div class="form-actions">
-              <button type="button" class="btn btn-secondary" onclick="closePocketForm()">Annuler</button>
-              <button type="submit" class="btn btn-primary">Sauvegarder</button>
-            </div>
-          </form>
-        </div>
-      </div>
 
       <!-- Statut du SEA avec bouton de désactivation -->
    <div id="seaStatusCard" class="card" style="background: #fef2f2; border-color: #fecaca;">
@@ -250,6 +191,66 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div id="pocketModal" class="modal-overlay">
+    <div class="modal">
+      <h3>Poche d'épargne</h3>
+      <div class="pocket-suggestions">
+        <button type="button" onclick="setPocketName('🏖️ Vacances')">🏖️ Vacances</button>
+        <button type="button" onclick="setPocketName('🚗 Voiture')">🚗 Voiture</button>
+        <button type="button" onclick="setPocketName('🏠 Maison')">🏠 Maison</button>
+        <button type="button" onclick="setPocketName('📚 Éducation')">📚 Éducation</button>
+        <button type="button" onclick="setPocketName('⚕️ Santé')">⚕️ Santé</button>
+        <button type="button" onclick="setPocketName('🎮 Loisirs')">🎮 Loisirs</button>
+        <button type="button" onclick="setPocketName('🛍️ Shopping')">🛍️ Shopping</button>
+        <button type="button" onclick="setPocketName('🎁 Cadeaux')">🎁 Cadeaux</button>
+        <button type="button" onclick="setPocketName('💡 Autre')">💡 Autre</button>
+        <button type="button" onclick="setPocketName('💰 Default')">💰 Default</button>
+      </div>
+      <form id="pocketForm">
+        <div class="form-group">
+          <label for="pocketName">Nom</label>
+          <input type="text" id="pocketName" required>
+        </div>
+        <div class="form-group">
+          <label for="pocketGoal">Objectif (€)</label>
+          <input type="number" id="pocketGoal" min="0">
+        </div>
+        <div class="form-group">
+          <label for="pocketDeadline">Échéance</label>
+          <input type="date" id="pocketDeadline">
+        </div>
+        <div class="form-group">
+          <label for="pocketMonthly">Montant mensuel (€)</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="number" id="pocketMonthly" min="0" style="flex: 1;">
+            <button type="button" class="btn btn-secondary" onclick="calculateMonthly()">Calculer</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="pocketFrom">Compte à prélever</label>
+          <select id="pocketFrom">
+            <option value="">--Choisissez un compte--</option>
+            <option value="compteCourant">Compte Courant</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="pocketTo">Compte destinataire</label>
+          <select id="pocketTo">
+            <option value="">--Choisissez le compte destinataire--</option>
+            <option value="livretA">Livret A</option>
+            <option value="ldds">LDDS</option>
+            <option value="pea">PEA</option>
+            <option value="cto">CTO</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closePocketForm()">Annuler</button>
+          <button type="submit" class="btn btn-primary">Sauvegarder</button>
+        </div>
+      </form>
     </div>
   </div>
 

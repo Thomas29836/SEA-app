@@ -635,6 +635,16 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', savePocket);
   }
 
+  const homeAddPocketBtn = document.getElementById('homeAddPocketBtn');
+  if (homeAddPocketBtn) {
+    homeAddPocketBtn.addEventListener('click', () => openPocketForm());
+  }
+
+  const refreshAccountsBtn = document.getElementById('refreshAccountsBtn');
+  if (refreshAccountsBtn) {
+    refreshAccountsBtn.addEventListener('click', updateBankAccounts);
+  }
+
   const editDetailBtn = document.getElementById('detailEditBtn');
   const deleteDetailBtn = document.getElementById('detailDeleteBtn');
   const backDetailBtn = document.getElementById('detailBackBtn');
@@ -661,6 +671,16 @@ document.addEventListener('DOMContentLoaded', function() {
 // Fonctions utilitaires par défaut si absentes
 function renderHistory() {}
 
+// Stub for refreshing bank accounts
+function updateBankAccounts() {
+  alert('Mise à jour des comptes bancaires...');
+}
+
+// Stub for refreshing bank accounts
+function updateBankAccounts() {
+  alert('Mise à jour des comptes bancaires...');
+}
+
 // Exposer les fonctions globalement pour les gestionnaires inline
 window.showPage = showPage;
 window.showDeactivateModal = showDeactivateModal;
@@ -679,3 +699,4 @@ window.deletePocket = deletePocket;
 window.calculateMonthly = calculateMonthly;
 window.setPocketName = setPocketName;
 window.showPocketDetail = showPocketDetail;
+window.updateBankAccounts = updateBankAccounts;
