@@ -103,12 +103,29 @@
 
 /* Shortcut icon to open settings */
 .settings-icon {
-  display: block;
-  text-align: right;
   font-size: 1.5rem;
   text-decoration: none;
-  margin-bottom: 0.5rem;
   color: #1e293b;
+}
+
+/* Header area on the home page */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.home-title h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.home-subtitle {
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: #64748b;
+  margin-top: 0.25rem;
 }
 
     .stat-card {
@@ -233,6 +250,34 @@
 
 .btn-danger:hover {
   background: #b91c1c;
+}
+
+/* Success and outline-danger buttons */
+.btn-success {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.btn-success:hover {
+  background: #15803d;
+}
+
+.btn-outline-danger {
+  background: #ffffff;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+}
+
+.btn-outline-danger:hover {
+  background: #fef2f2;
+}
+
+/* Actions below pocket detail cards */
+.money-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 /* Header section inside pages */

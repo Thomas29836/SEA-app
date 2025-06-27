@@ -420,6 +420,32 @@ function deletePocket(index) {
   }
 }
 
+function addMoney(index) {
+  const amount = parseFloat(prompt('Montant à ajouter :'));
+  if (isNaN(amount) || amount <= 0) return;
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+  if (!pockets[index]) return;
+  pockets[index].saved = (pockets[index].saved || 0) + amount;
+  localStorage.setItem('pockets', JSON.stringify(pockets));
+  showPocketDetail(index);
+  displayPockets();
+  renderPockets();
+  updateTotals();
+}
+
+function withdrawMoney(index) {
+  const amount = parseFloat(prompt('Montant à retirer :'));
+  if (isNaN(amount) || amount <= 0) return;
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+  if (!pockets[index]) return;
+  pockets[index].saved = Math.max(0, (pockets[index].saved || 0) - amount);
+  localStorage.setItem('pockets', JSON.stringify(pockets));
+  showPocketDetail(index);
+  displayPockets();
+  renderPockets();
+  updateTotals();
+}
+
 // Calcul automatique du montant mensuel
 function calculateMonthly() {
   const goal = parseFloat(document.getElementById('pocketGoal').value) || 0;
@@ -618,8 +644,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
   e.preventDefault();
 
   document.getElementById('loginPage').style.display = 'none';
-  document.querySelector('header').style.display = '';
-  document.querySelector('nav.nav-tabs').style.display = '';
+  // Ne pas afficher l'en-tête ni la barre de navigation
   document.querySelector('.content').style.display = '';
 
   showPage(null, 'accueil');
@@ -680,26 +705,35 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshAccountsBtn.addEventListener('click', updateBankAccounts);
   }
 
-  const editDetailBtn = document.getElementById('detailEditBtn');
-  const deleteDetailBtn = document.getElementById('detailDeleteBtn');
-  const backDetailBtn = document.getElementById('detailBackBtn');
-  const settingsBackBtn = document.getElementById('settingsBackBtn');
-  if (editDetailBtn) {
-    editDetailBtn.addEventListener('click', () => openPocketForm(currentPocketIndex));
-  }
-  if (deleteDetailBtn) {
-    deleteDetailBtn.addEventListener('click', () => deletePocket(currentPocketIndex));
-  }
+    const editDetailBtn = document.getElementById('detailEditBtn');
+    const deleteDetailBtn = document.getElementById('detailDeleteBtn');
+    const backDetailBtn = document.getElementById('detailBackBtn');
+    const settingsBackBtn = document.getElementById('settingsBackBtn');
+    const addMoneyBtn = document.getElementById('addMoneyBtn');
+    const withdrawMoneyBtn = document.getElementById('withdrawMoneyBtn');
+    if (editDetailBtn) {
+      editDetailBtn.addEventListener('click', () => openPocketForm(currentPocketIndex));
+    }
+    if (deleteDetailBtn) {
+      deleteDetailBtn.addEventListener('click', () => deletePocket(currentPocketIndex));
+    }
   if (backDetailBtn) {
     backDetailBtn.addEventListener('click', () => showPage(null, 'accueil'));
   }
-  if (settingsBackBtn) {
-    settingsBackBtn.addEventListener('click', () => {
-      showPage(null, 'accueil');
-      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.nav-tab')[0].classList.add('active');
-    });
-  }
+    if (settingsBackBtn) {
+      settingsBackBtn.addEventListener('click', () => {
+        showPage(null, 'accueil');
+        document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-tab')[0].classList.add('active');
+      });
+    }
+
+    if (addMoneyBtn) {
+      addMoneyBtn.addEventListener('click', () => addMoney(currentPocketIndex));
+    }
+    if (withdrawMoneyBtn) {
+      withdrawMoneyBtn.addEventListener('click', () => withdrawMoney(currentPocketIndex));
+    }
 
   const modal = document.getElementById('pocketModal');
   if (modal) {
@@ -747,3 +781,5 @@ window.setPocketName = setPocketName;
 window.showPocketDetail = showPocketDetail;
 window.updateBankAccounts = updateBankAccounts;
 window.goToSettings = goToSettings;
+window.addMoney = addMoney;
+window.withdrawMoney = withdrawMoney;

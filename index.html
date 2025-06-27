@@ -51,9 +51,6 @@
     </div>
   </div>
 
-  <header style="display:none;">
-    <h1>Mon SEA</h1>
-  </header>
   <!-- Navigation -->
   <nav class="nav-tabs" style="display:none;">
     <button class="nav-tab active" onclick="showPage(event, 'accueil')">
@@ -66,7 +63,13 @@
 <div class="content" style="display:none;">
     <!-- Page d'accueil/tableau de bord SEA -->
     <div id="accueil" class="page active">
-      <a href="#" id="settingsShortcut" class="settings-icon" onclick="goToSettings()" title="Paramètres">⚙️</a>
+      <div class="home-header">
+        <div class="home-title">
+          <h1>Mon SEA</h1>
+          <p class="home-subtitle">Gérez vos objectifs d'épargne en toute simplicité</p>
+        </div>
+        <a href="#" id="settingsShortcut" class="settings-icon" onclick="goToSettings()" title="Paramètres">⚙️</a>
+      </div>
       <div class="stats-grid">
         <div class="stat-card">
           <h5>Total épargné</h5>
@@ -251,6 +254,10 @@
           <p>Prélèvement : <span id="detailFrom"></span></p>
           <p>Destinataire : <span id="detailTo"></span></p>
         </div>
+      </div>
+      <div class="money-actions">
+        <button type="button" id="addMoneyBtn" class="btn btn-success">+ Ajouter de l'argent</button>
+        <button type="button" id="withdrawMoneyBtn" class="btn btn-outline-danger">- Retirer de l'argent</button>
       </div>
     </div>
 
