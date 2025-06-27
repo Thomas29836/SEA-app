@@ -72,12 +72,14 @@ if (seaForm) {
     // Fonctions pour la modal de désactivation
     function showDeactivateModal() {
       const modal = document.getElementById('deactivateModal');
+      if (!modal) return;
       modal.classList.add('active');
       document.body.style.overflow = 'hidden'; // Empêcher le scroll
     }
 
     function closeDeactivateModal() {
       const modal = document.getElementById('deactivateModal');
+      if (!modal) return;
       modal.classList.remove('active');
       document.body.style.overflow = ''; // Rétablir le scroll
     }
@@ -90,12 +92,15 @@ if (seaForm) {
 }
 
     // Fonction pour mettre à jour l'affichage du statut SEA
-    function updateSeaStatus() {
-      const statusCard = document.getElementById('seaStatusCard');
-      const statusIcon = document.getElementById('seaStatusIcon');
-      const statusTitle = document.getElementById('seaStatusTitle');
-      const statusText = document.getElementById('seaStatusText');
-      const toggleBtn = document.getElementById('toggleSeaBtn');
+      function updateSeaStatus() {
+        const statusCard = document.getElementById('seaStatusCard');
+        const statusIcon = document.getElementById('seaStatusIcon');
+        const statusTitle = document.getElementById('seaStatusTitle');
+        const statusText = document.getElementById('seaStatusText');
+        const toggleBtn = document.getElementById('toggleSeaBtn');
+        if (!statusCard || !statusIcon || !statusTitle || !statusText || !toggleBtn) {
+          return;
+        }
 
       if (seaActive) {
         // SEA actif
@@ -367,13 +372,9 @@ function savePocket(e) {
   closePocketForm();
   displayPockets();
   renderPockets();
-  if (
-    document.getElementById('pocketDetail') &&
-    document.getElementById('pocketDetail').classList.contains('active')
-  ) {
-    const idx = index >= 0 ? index : pockets.length - 1;
-    showPocketDetail(idx);
-  }
+  showPage(null, 'accueil');
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelector('.nav-tab').classList.add('active');
 }
 
 function deletePocket(index) {
@@ -421,11 +422,14 @@ function setPocketName(name) {
 }
 
     // Fermer la modal en cliquant en dehors
-    document.getElementById('deactivateModal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeDeactivateModal();
+      const deactivateModalEl = document.getElementById('deactivateModal');
+      if (deactivateModalEl) {
+        deactivateModalEl.addEventListener('click', function(e) {
+          if (e.target === this) {
+            closeDeactivateModal();
+          }
+        });
       }
-    });
 
     // Fonctions pour les paramètres
 function resetSEA() {
@@ -463,11 +467,10 @@ function resetSEA() {
 
     alert('SEA réinitialisé !');
 
-    // Rediriger vers la page de configuration du SEA
-    showPage(null, 'sea');
-    // Activer l'onglet SEA
-    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.nav-tab')[1].classList.add('active');
+      // Retourner à la page d'accueil
+      showPage(null, 'accueil');
+      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.nav-tab')[0].classList.add('active');
   }
 }
 
@@ -670,11 +673,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fonctions utilitaires par défaut si absentes
 function renderHistory() {}
-
-// Stub for refreshing bank accounts
-function updateBankAccounts() {
-  alert('Mise à jour des comptes bancaires...');
-}
 
 // Stub for refreshing bank accounts
 function updateBankAccounts() {

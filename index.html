@@ -59,12 +59,6 @@
     <button class="nav-tab active" onclick="showPage(event, 'accueil')">
       🏠<br>Accueil
     </button>
-    <button class="nav-tab" onclick="showPage(event, 'sea')">
-      🎯<br>SEA
-    </button>
-    <button class="nav-tab" onclick="showPage(event, 'historique')">
-      📊<br>Historique
-    </button>
     <button class="nav-tab" onclick="showPage(event, 'parametres')">
       ⚙️<br>Paramètres
     </button>
@@ -104,39 +98,6 @@
       </div>
       <div id="pocketsContainer" class="cards-grid"></div>
 
-    </div>
-
-    <!-- Page de configuration SEA -->
-    <div id="sea" class="page">
-      <!-- Ancien formulaire de configuration SEA supprimé -->
-
-      <div class="card">
-        <h3 style="margin-bottom:1rem;">Mes poches d'épargne</h3>
-        <div id="pocketsConfigContainer" class="cards-grid"></div>
-        <button id="addPocketBtn" type="button" class="btn btn-primary" style="width:100%;">➕ Ajouter une poche</button>
-      </div>
-
-
-      <!-- Statut du SEA avec bouton de désactivation -->
-   <div id="seaStatusCard" class="card" style="background: #fef2f2; border-color: #fecaca;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span id="seaStatusIcon" style="color: #dc2626; font-size: 1.25rem;">❌</span>
-            <div>
-              <h4 id="seaStatusTitle" style="color: #991b1b; margin-bottom: 0.25rem;">SEA Inactif</h4>
-              <p id="seaStatusText" style="color: #dc2626; font-size: 0.8rem;">Votre épargne automatisée est suspendue</p>
-            </div>
-          </div>
-          <button id="toggleSeaBtn" type="button" class="btn btn-primary" onclick="reactivateSEA()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-            ✅ Réactiver
-          </button>
-        </div>
-      </div>
-      </div>
-
-    <!-- Historique des virements -->
-    <div id="historique" class="page">
-      <h2 style="margin-bottom: 1.5rem;">Historique des virements</h2>
     </div>
 
     <!-- Page Paramètres -->
@@ -293,23 +254,6 @@
         </div>
       </div>
     </div>
-
-  <!-- Modal de confirmation pour désactivation -->
-  <div id="deactivateModal" class="modal-overlay">
-    <div class="modal">
-      <h3>⚠️ Confirmation</h3>
-      <p>Vous êtes sûr de vouloir désactiver votre SEA ?<br><br>
-      Vos virements automatiques seront suspendus jusqu'à réactivation.</p>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" onclick="closeDeactivateModal()">
-          Annuler
-        </button>
-        <button type="button" class="btn btn-danger" onclick="confirmDeactivateSEA()">
-          Valider
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!--JavaScript-->
  <script src="script.js"></script>
