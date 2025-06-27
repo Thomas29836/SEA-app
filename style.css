@@ -116,6 +116,14 @@
   margin-bottom: 1rem;
 }
 
+/* Header on the settings page */
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
 .home-title h1 {
   font-size: 1.25rem;
   font-weight: 700;
