@@ -1,6 +1,18 @@
  // Variable pour suivre l'état du SEA
-    let seaActive = false;
-    let currentPocketIndex = -1;
+let seaActive = false;
+let currentPocketIndex = -1;
+const accountColors = [
+  '#f87171',
+  '#fb923c',
+  '#facc15',
+  '#4ade80',
+  '#2dd4bf',
+  '#60a5fa',
+  '#818cf8',
+  '#a78bfa',
+  '#f472b6',
+  '#94a3b8'
+];
 
 // Format date as DD/MM/YYYY
 function formatDateDisplay(dateStr) {
@@ -729,7 +741,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const refreshAccountsBtn = document.getElementById('refreshAccountsBtn');
   if (refreshAccountsBtn) {
-    refreshAccountsBtn.addEventListener('click', updateBankAccounts);
+    refreshAccountsBtn.addEventListener('click', openBankAccountsModal);
   }
 
   populateHistoryPocketFilter();
@@ -772,6 +784,23 @@ document.addEventListener('DOMContentLoaded', function() {
     modal.addEventListener('click', function(e) {
       if (e.target === this) {
         closePocketForm();
+      }
+    });
+  }
+
+  const addAccountBtn = document.getElementById('addAccountBtn');
+  const accountForm = document.getElementById('accountForm');
+  const cancelAccountBtn = document.getElementById('cancelAccountBtn');
+  const closeAccountsBtn = document.getElementById('closeAccountsBtn');
+  const accountsModal = document.getElementById('accountsModal');
+  if (addAccountBtn) addAccountBtn.addEventListener('click', () => openAccountForm());
+  if (accountForm) accountForm.addEventListener('submit', saveAccount);
+  if (cancelAccountBtn) cancelAccountBtn.addEventListener('click', closeAccountForm);
+  if (closeAccountsBtn) closeAccountsBtn.addEventListener('click', closeBankAccountsModal);
+  if (accountsModal) {
+    accountsModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeBankAccountsModal();
       }
     });
   }
@@ -906,8 +935,153 @@ function renderHomeHistory(page = 1) {
 }
 
 // Stub for refreshing bank accounts
-function updateBankAccounts() {
-  alert('Mise à jour des comptes bancaires...');
+function renderAccountColors() {
+  const container = document.getElementById('accountColorChoices');
+  if (!container) return;
+  container.innerHTML = '';
+  accountColors.forEach(color => {
+    const label = document.createElement('label');
+    label.className = 'color-option';
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'accountColor';
+    input.value = color;
+    const span = document.createElement('span');
+    span.style.backgroundColor = color;
+    label.appendChild(input);
+    label.appendChild(span);
+    container.appendChild(label);
+  });
+}
+
+function updateAccountsSummary(accounts) {
+  const countEl = document.getElementById('accountsCount');
+  const totalEl = document.getElementById('accountsTotal');
+  const total = accounts.reduce((s, a) => s + (a.balance || 0), 0);
+  if (countEl) countEl.textContent = accounts.length;
+  if (totalEl) totalEl.textContent = total + '€';
+}
+
+function renderAccounts() {
+  const listEl = document.getElementById('accountsList');
+  if (!listEl) return;
+  const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+  listEl.innerHTML = '';
+  accounts.forEach((acc, i) => {
+    const item = document.createElement('div');
+    item.className = 'account-item';
+    const info = document.createElement('div');
+    info.className = 'account-info';
+    const color = document.createElement('span');
+    color.className = 'account-color';
+    color.style.backgroundColor = acc.color;
+    const name = document.createElement('span');
+    name.textContent = acc.name;
+    const balance = document.createElement('span');
+    balance.textContent = acc.balance + '€';
+    const type = document.createElement('span');
+    type.textContent = acc.type;
+    info.appendChild(color);
+    info.appendChild(name);
+    info.appendChild(balance);
+    info.appendChild(type);
+    const actions = document.createElement('div');
+    const edit = document.createElement('button');
+    edit.className = 'btn btn-secondary btn-sm';
+    edit.textContent = '✏️';
+    edit.addEventListener('click', () => openAccountForm(i));
+    const del = document.createElement('button');
+    del.className = 'btn btn-danger btn-sm';
+    del.textContent = '🗑️';
+    del.addEventListener('click', () => deleteAccount(i));
+    actions.appendChild(edit);
+    actions.appendChild(del);
+    item.appendChild(info);
+    item.appendChild(actions);
+    listEl.appendChild(item);
+  });
+  updateAccountsSummary(accounts);
+}
+
+function openBankAccountsModal() {
+  const modal = document.getElementById('accountsModal');
+  if (!modal) return;
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  renderAccountColors();
+  renderAccounts();
+}
+
+function closeBankAccountsModal() {
+  const modal = document.getElementById('accountsModal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+  closeAccountForm();
+}
+
+function openAccountForm(index = -1) {
+  const formSection = document.getElementById('accountFormSection');
+  const listSection = document.getElementById('accountsListSection');
+  const form = document.getElementById('accountForm');
+  if (!formSection || !listSection || !form) return;
+  formSection.style.display = 'block';
+  listSection.style.display = 'none';
+  form.dataset.index = index;
+  form.reset();
+  renderAccountColors();
+  if (index >= 0) {
+    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+    const a = accounts[index];
+    if (a) {
+      document.getElementById('accountName').value = a.name;
+      document.getElementById('accountBank').value = a.bank;
+      document.getElementById('accountBalance').value = a.balance;
+      document.getElementById('accountType').value = a.type;
+      const colorInput = document.querySelector(`input[name='accountColor'][value='${a.color}']`);
+      if (colorInput) colorInput.checked = true;
+    }
+  }
+}
+
+function closeAccountForm() {
+  const formSection = document.getElementById('accountFormSection');
+  const listSection = document.getElementById('accountsListSection');
+  if (formSection && listSection) {
+    formSection.style.display = 'none';
+    listSection.style.display = 'block';
+  }
+}
+
+function saveAccount(e) {
+  e.preventDefault();
+  const form = e.target;
+  const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+  const index = parseInt(form.dataset.index, 10);
+  const colorInput = document.querySelector('input[name="accountColor"]:checked');
+  const data = {
+    name: document.getElementById('accountName').value.trim(),
+    bank: document.getElementById('accountBank').value.trim(),
+    balance: parseFloat(document.getElementById('accountBalance').value) || 0,
+    type: document.getElementById('accountType').value,
+    color: colorInput ? colorInput.value : accountColors[0]
+  };
+  if (index >= 0) {
+    accounts[index] = data;
+  } else {
+    accounts.push(data);
+  }
+  localStorage.setItem('accounts', JSON.stringify(accounts));
+  closeAccountForm();
+  renderAccounts();
+}
+
+function deleteAccount(index) {
+  if (!confirm('Supprimer ce compte ?')) return;
+  const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+  accounts.splice(index, 1);
+  localStorage.setItem('accounts', JSON.stringify(accounts));
+  renderAccounts();
 }
 
 // Navigate to the settings page from the shortcut icon
@@ -936,7 +1110,11 @@ window.deletePocket = deletePocket;
 window.calculateMonthly = calculateMonthly;
 window.setPocketName = setPocketName;
 window.showPocketDetail = showPocketDetail;
-window.updateBankAccounts = updateBankAccounts;
+window.openBankAccountsModal = openBankAccountsModal;
+window.closeBankAccountsModal = closeBankAccountsModal;
+window.openAccountForm = openAccountForm;
+window.saveAccount = saveAccount;
+window.deleteAccount = deleteAccount;
 window.goToSettings = goToSettings;
 window.addMoney = addMoney;
 window.withdrawMoney = withdrawMoney;

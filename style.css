@@ -575,9 +575,65 @@
       gap: 1rem;
     }
 
-    .modal-actions .btn {
-      flex: 1;
-    }
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* Gestion des comptes bancaires */
+.accounts-modal {
+  max-width: 500px;
+}
+
+.accounts-summary {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.account-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.account-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.account-color {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+}
+
+.color-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.color-option input {
+  display: none;
+}
+
+.color-option span {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.color-option input:checked + span {
+  border-color: #3b82f6;
+}
 
     /* État désactivé du SEA */
     .sea-inactive {
