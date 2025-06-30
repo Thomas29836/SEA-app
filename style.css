@@ -285,24 +285,28 @@
   margin-top: 1rem;
 }
 
-#historyTable td:nth-child(2) {
+#historyTable td:nth-child(2),
+#homeHistoryTable td:nth-child(2) {
   font-weight: 700;
 }
 
-#historyPagination {
+#historyPagination,
+#homeHistoryPagination {
   margin-top: 0.5rem;
   display: flex;
   gap: 0.25rem;
 }
 
-#historyPagination button {
+#historyPagination button,
+#homeHistoryPagination button {
   padding: 0.25rem 0.5rem;
   border: 1px solid #e2e8f0;
   background: white;
   cursor: pointer;
 }
 
-#historyPagination button.active {
+#historyPagination button.active,
+#homeHistoryPagination button.active {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;

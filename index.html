@@ -99,6 +99,48 @@
       </div>
       <div id="pocketsContainer" class="cards-grid"></div>
 
+      <div id="homeHistory" class="history-section">
+        <div class="section-header">
+          <h4>Historique</h4>
+          <div class="header-actions">
+            <select id="historyTypeFilter">
+              <option value="all">Toutes</option>
+              <option value="deposit">Dépôts uniquement</option>
+              <option value="withdraw">Retraits uniquement</option>
+            </select>
+            <select id="historyPocketFilter"></select>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h5>Total dépôts</h5>
+            <p id="historyDeposits">0€</p>
+          </div>
+          <div class="stat-card">
+            <h5>Total retraits</h5>
+            <p id="historyWithdrawals">0€</p>
+          </div>
+          <div class="stat-card">
+            <h5>Solde net</h5>
+            <p id="historyNet">0€</p>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="homeHistoryTable">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="homeHistoryPagination" class="pagination"></div>
+      </div>
+
     </div>
 
   <!-- Page Paramètres -->

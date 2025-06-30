@@ -228,6 +228,8 @@ function displayPockets() {
     });
 
   updateTotals();
+  populateHistoryPocketFilter();
+  renderHomeHistory();
 }
 
 function showPocketDetail(index) {
@@ -399,6 +401,8 @@ function savePocket(e) {
   closePocketForm();
   displayPockets();
   renderPockets();
+  populateHistoryPocketFilter();
+  renderHomeHistory();
   if (returnTo === 'detail' && index >= 0) {
     showPocketDetail(index);
   } else {
@@ -415,6 +419,8 @@ function deletePocket(index) {
   localStorage.setItem('pockets', JSON.stringify(pockets));
   displayPockets();
   renderPockets();
+  populateHistoryPocketFilter();
+  renderHomeHistory();
   if (document.getElementById('pocketDetail') &&
       document.getElementById('pocketDetail').classList.contains('active')) {
     showPage(null, 'accueil');
@@ -440,6 +446,7 @@ function addMoney(index) {
   displayPockets();
   renderPockets();
   updateTotals();
+  renderHomeHistory();
 }
 
 function withdrawMoney(index) {
@@ -461,6 +468,7 @@ function withdrawMoney(index) {
   displayPockets();
   renderPockets();
   updateTotals();
+  renderHomeHistory();
 }
 
 // Calcul automatique du montant mensuel
@@ -537,6 +545,8 @@ function resetSEA() {
     if (typeof displayPockets === 'function') {
       displayPockets();
     }
+    populateHistoryPocketFilter();
+    renderHomeHistory();
 
     alert('SEA réinitialisé !');
 
@@ -722,6 +732,11 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshAccountsBtn.addEventListener('click', updateBankAccounts);
   }
 
+  populateHistoryPocketFilter();
+  renderHomeHistory();
+  document.getElementById('historyTypeFilter')?.addEventListener('change', () => renderHomeHistory());
+  document.getElementById('historyPocketFilter')?.addEventListener('change', () => renderHomeHistory());
+
     const editDetailBtn = document.getElementById('detailEditBtn');
     const deleteDetailBtn = document.getElementById('detailDeleteBtn');
     const backDetailBtn = document.getElementById('detailBackBtn');
@@ -809,6 +824,87 @@ function renderHistory(index = currentPocketIndex, page = 1) {
   }
 }
 
+function populateHistoryPocketFilter() {
+  const select = document.getElementById('historyPocketFilter');
+  if (!select) return;
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+  select.innerHTML = '<option value="all">Toutes les poches</option>';
+  pockets.forEach((p, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = p.name;
+    select.appendChild(opt);
+  });
+}
+
+function renderHomeHistory(page = 1) {
+  const typeFilter = document.getElementById('historyTypeFilter')?.value || 'all';
+  const pocketFilter = document.getElementById('historyPocketFilter')?.value || 'all';
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+
+  let txs = [];
+  pockets.forEach((p, index) => {
+    if (pocketFilter === 'all' || pocketFilter == index) {
+      (p.history || []).forEach(t => {
+        if (typeFilter === 'all' || t.type === typeFilter) {
+          txs.push(t);
+        }
+      });
+    }
+  });
+
+  txs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const totalDeposits = txs.filter(t => t.type === 'deposit').reduce((s, t) => s + t.amount, 0);
+  const totalWithdrawals = txs.filter(t => t.type === 'withdraw').reduce((s, t) => s + t.amount, 0);
+  const net = totalDeposits - totalWithdrawals;
+
+  const depositsEl = document.getElementById('historyDeposits');
+  const withdrawalsEl = document.getElementById('historyWithdrawals');
+  const netEl = document.getElementById('historyNet');
+  if (depositsEl) depositsEl.textContent = `${totalDeposits}€`;
+  if (withdrawalsEl) withdrawalsEl.textContent = `${totalWithdrawals}€`;
+  if (netEl) netEl.textContent = `${net}€`;
+
+  const tbody = document.querySelector('#homeHistoryTable tbody');
+  const pagination = document.getElementById('homeHistoryPagination');
+  if (!tbody || !pagination) return;
+
+  const perPage = 5;
+  const totalPages = Math.ceil(txs.length / perPage) || 1;
+  page = Math.min(Math.max(1, page), totalPages);
+
+  tbody.innerHTML = '';
+  txs.slice((page - 1) * perPage, (page - 1) * perPage + perPage).forEach(item => {
+    const tr = document.createElement('tr');
+    const typeTd = document.createElement('td');
+    typeTd.textContent = item.type === 'deposit' ? 'Dépôt' : 'Retrait';
+    const amountTd = document.createElement('td');
+    amountTd.textContent = `${item.type === 'deposit' ? '+' : '-'}${item.amount}€`;
+    amountTd.style.color = item.type === 'deposit' ? 'green' : 'red';
+    const dateTd = document.createElement('td');
+    dateTd.textContent = new Date(item.date).toLocaleDateString('fr-FR');
+    const descTd = document.createElement('td');
+    descTd.textContent = item.description || '';
+    tr.appendChild(typeTd);
+    tr.appendChild(amountTd);
+    tr.appendChild(dateTd);
+    tr.appendChild(descTd);
+    tbody.appendChild(tr);
+  });
+
+  pagination.innerHTML = '';
+  if (totalPages > 1) {
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      if (i === page) btn.classList.add('active');
+      btn.addEventListener('click', () => renderHomeHistory(i));
+      pagination.appendChild(btn);
+    }
+  }
+}
+
 // Stub for refreshing bank accounts
 function updateBankAccounts() {
   alert('Mise à jour des comptes bancaires...');
@@ -844,3 +940,4 @@ window.updateBankAccounts = updateBankAccounts;
 window.goToSettings = goToSettings;
 window.addMoney = addMoney;
 window.withdrawMoney = withdrawMoney;
+window.renderHomeHistory = renderHomeHistory;
