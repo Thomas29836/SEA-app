@@ -94,8 +94,8 @@ if (seaForm) {
     // Retourner à l'accueil
     showPage(null, 'accueil');
 
-    // Réactiver l'onglet accueil
-    document.querySelector('.nav-tab').classList.add('active');
+    // Réactiver l'onglet accueil␊
+    document.querySelector('.nav-tab')?.classList.add('active');
   });
 }
 
@@ -421,8 +421,9 @@ function savePocket(e) {
     showPocketDetail(index);
   } else {
     showPage(null, 'accueil');
-    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelector('.nav-tab').classList.add('active');
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    tabs[0]?.classList.add('active');
   }
 }
 
@@ -566,9 +567,34 @@ function resetSEA() {
 
       // Retourner à la page d'accueil
       showPage(null, 'accueil');
-      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.nav-tab')[0].classList.add('active');
+      const tabs = document.querySelectorAll('.nav-tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      tabs[0]?.classList.add('active');
   }
+}
+
+// Déconnexion de l'utilisateur
+function logout() {
+  // Supprimer le flag de connexion
+  localStorage.removeItem('isLoggedIn');
+
+  // Masquer les sections réservées aux utilisateurs connectés
+  const navTabs = document.querySelector('.nav-tabs');
+  const content = document.querySelector('.content');
+  if (navTabs) navTabs.style.display = 'none';
+  if (content) content.style.display = 'none';
+
+  // Afficher l'écran de connexion
+  const loginPage = document.getElementById('loginPage');
+  const registerPage = document.getElementById('registerPage');
+  if (loginPage) loginPage.style.display = '';
+  if (registerPage) registerPage.style.display = 'none';
+
+  // Réinitialiser l'onglet actif
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+  showPage(null, 'accueil');
+
+  alert('Vous avez été déconnecté avec succès');
 }
 
     // Gestion de l'édition des informations utilisateur
@@ -684,12 +710,16 @@ function isValidEmail(email) {
 document.getElementById('loginForm').addEventListener('submit', function(e) {
   e.preventDefault();
 
+  // Marquer la session comme active
+  localStorage.setItem('isLoggedIn', 'true');
+
   document.getElementById('loginPage').style.display = 'none';
-  // Ne pas afficher l'en-tête ni la barre de navigation
+  const navTabs = document.querySelector('.nav-tabs');
+  if (navTabs) navTabs.style.display = 'flex';
   document.querySelector('.content').style.display = '';
 
   showPage(null, 'accueil');
-  document.querySelector('.nav-tab').classList.add('active');
+  document.querySelector('.nav-tab')?.classList.add('active');
 });
 
 // Changement vers la page d'inscription
@@ -721,6 +751,25 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.style.transition = 'opacity 0.3s';
     document.body.style.opacity = '1';
   }, 100);
+
+  // Afficher la bonne interface selon l'état de connexion
+  const navTabs = document.querySelector('.nav-tabs');
+  const content = document.querySelector('.content');
+  const loginPage = document.getElementById('loginPage');
+  const registerPage = document.getElementById('registerPage');
+  if (localStorage.getItem('isLoggedIn') === 'true') {
+    if (navTabs) navTabs.style.display = 'flex';
+    if (content) content.style.display = '';
+    if (loginPage) loginPage.style.display = 'none';
+    if (registerPage) registerPage.style.display = 'none';
+    showPage(null, 'accueil');
+    document.querySelector('.nav-tab')?.classList.add('active');
+  } else {
+    if (navTabs) navTabs.style.display = 'none';
+    if (content) content.style.display = 'none';
+    if (loginPage) loginPage.style.display = '';
+    if (registerPage) registerPage.style.display = 'none';
+  }
 
   // Initialiser l'état du SEA lors du chargement
   updateSeaStatus();
@@ -770,8 +819,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (settingsBackBtn) {
       settingsBackBtn.addEventListener('click', () => {
         showPage(null, 'accueil');
-        document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.nav-tab')[0].classList.add('active');
+        const tabs = document.querySelectorAll('.nav-tab');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        tabs[0]?.classList.add('active');
       });
     }
 
@@ -1127,9 +1177,9 @@ function deleteAccount(index) {
 // Navigate to the settings page from the shortcut icon
 function goToSettings() {
   showPage(null, 'parametres');
-  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
   const tabs = document.querySelectorAll('.nav-tab');
-  if (tabs[1]) tabs[1].classList.add('active');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  tabs[1]?.classList.add('active');
 }
 
 // Exposer les fonctions globalement pour les gestionnaires inline
