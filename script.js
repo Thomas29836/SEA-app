@@ -359,6 +359,8 @@ function openPocketForm(index = -1) {
   form.dataset.index = index;
   form.reset();
 
+  populateAccountSelects();
+
   // Stocker la page de retour apres sauvegarde
   const detailActive = document.getElementById('pocketDetail')?.classList.contains('active');
   form.dataset.returnTo = detailActive ? 'detail' : 'home';
@@ -724,6 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
   updateSeaStatus();
   displayPockets();
   renderPockets();
+  populateAccountSelects();
 
   const addBtn = document.getElementById('addPocketBtn');
   const form = document.getElementById('pocketForm');
@@ -864,6 +867,41 @@ function populateHistoryPocketFilter() {
     opt.textContent = p.name;
     select.appendChild(opt);
   });
+}
+
+function populateAccountSelects() {
+  const fromSelect = document.getElementById('pocketFrom');
+  const toSelect = document.getElementById('pocketTo');
+  if (!fromSelect || !toSelect) return;
+
+  const prevFrom = fromSelect.value;
+  const prevTo = toSelect.value;
+
+  fromSelect.innerHTML = '<option value="">--Choisissez un compte--</option>';
+  toSelect.innerHTML =
+    '<option value="">--Choisissez le compte destinataire--</option>';
+
+  const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+  accounts.forEach(acc => {
+    const label = acc.bank ? `${acc.name} - ${acc.bank}` : acc.name;
+    if (acc.type === 'courant') {
+      const opt = document.createElement('option');
+      opt.value = acc.name;
+      opt.textContent = label;
+      if (acc.color) opt.style.backgroundColor = acc.color;
+      fromSelect.appendChild(opt);
+    }
+    if (acc.type === 'epargne' || acc.type === 'investissement') {
+      const opt = document.createElement('option');
+      opt.value = acc.name;
+      opt.textContent = label;
+      if (acc.color) opt.style.backgroundColor = acc.color;
+      toSelect.appendChild(opt);
+    }
+  });
+
+  if (prevFrom) fromSelect.value = prevFrom;
+  if (prevTo) toSelect.value = prevTo;
 }
 
 function renderHomeHistory(page = 1) {
@@ -1074,6 +1112,7 @@ function saveAccount(e) {
   localStorage.setItem('accounts', JSON.stringify(accounts));
   closeAccountForm();
   renderAccounts();
+  populateAccountSelects();
 }
 
 function deleteAccount(index) {
@@ -1082,6 +1121,7 @@ function deleteAccount(index) {
   accounts.splice(index, 1);
   localStorage.setItem('accounts', JSON.stringify(accounts));
   renderAccounts();
+  populateAccountSelects();
 }
 
 // Navigate to the settings page from the shortcut icon
