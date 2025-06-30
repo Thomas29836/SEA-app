@@ -103,10 +103,8 @@
 
   <!-- Page Paramètres -->
  <div id="parametres" class="page">
-      <div class="settings-header">
-        <h2>Paramètres</h2>
-        <button type="button" class="btn btn-secondary" id="settingsBackBtn">⬅️</button>
-      </div>
+      <button type="button" class="btn btn-secondary" id="settingsBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
+      <h2 style="margin-bottom: 1.5rem;">Paramètres</h2>
 
       <div class="card">
         <div class="settings-section">
@@ -260,6 +258,23 @@
       <div class="money-actions">
         <button type="button" id="addMoneyBtn" class="btn btn-success">+ Ajouter de l'argent</button>
         <button type="button" id="withdrawMoneyBtn" class="btn btn-outline-danger">- Retirer de l'argent</button>
+      </div>
+      <div id="historySection" class="history-section">
+        <h4>Historique des transactions</h4>
+        <div class="table-container">
+          <table id="historyTable">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="historyPagination" class="pagination"></div>
       </div>
     </div>
 

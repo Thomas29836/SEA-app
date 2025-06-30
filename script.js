@@ -249,6 +249,7 @@ function showPocketDetail(index) {
   document.getElementById('detailFrom').textContent = pocket.from || '-';
   document.getElementById('detailTo').textContent = pocket.to || '-';
   showPage(null, 'pocketDetail');
+  renderHistory(index, 1);
 }
 
 function renderPockets() {
@@ -423,9 +424,17 @@ function deletePocket(index) {
 function addMoney(index) {
   const amount = parseFloat(prompt('Montant à ajouter :'));
   if (isNaN(amount) || amount <= 0) return;
+  const description = prompt('Description', 'épargne automatique') || '';
   const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   if (!pockets[index]) return;
   pockets[index].saved = (pockets[index].saved || 0) + amount;
+  pockets[index].history = pockets[index].history || [];
+  pockets[index].history.unshift({
+    type: 'deposit',
+    amount,
+    date: new Date().toISOString(),
+    description
+  });
   localStorage.setItem('pockets', JSON.stringify(pockets));
   showPocketDetail(index);
   displayPockets();
@@ -436,9 +445,17 @@ function addMoney(index) {
 function withdrawMoney(index) {
   const amount = parseFloat(prompt('Montant à retirer :'));
   if (isNaN(amount) || amount <= 0) return;
+  const description = prompt('Description (optionnel)') || '';
   const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   if (!pockets[index]) return;
   pockets[index].saved = Math.max(0, (pockets[index].saved || 0) - amount);
+  pockets[index].history = pockets[index].history || [];
+  pockets[index].history.unshift({
+    type: 'withdraw',
+    amount,
+    date: new Date().toISOString(),
+    description
+  });
   localStorage.setItem('pockets', JSON.stringify(pockets));
   showPocketDetail(index);
   displayPockets();
@@ -745,8 +762,52 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Fonctions utilitaires par défaut si absentes
-function renderHistory() {}
+// Afficher l'historique des transactions pour une poche
+function renderHistory(index = currentPocketIndex, page = 1) {
+  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
+  const pocket = pockets[index];
+  if (!pocket) return;
+
+  const history = pocket.history || [];
+  const tbody = document.querySelector('#historyTable tbody');
+  const pagination = document.getElementById('historyPagination');
+  if (!tbody || !pagination) return;
+
+  const perPage = 5;
+  const totalPages = Math.ceil(history.length / perPage) || 1;
+  page = Math.min(Math.max(1, page), totalPages);
+
+  tbody.innerHTML = '';
+  history.slice((page - 1) * perPage, (page - 1) * perPage + perPage)
+    .forEach(item => {
+      const tr = document.createElement('tr');
+      const typeTd = document.createElement('td');
+      typeTd.textContent = item.type === 'deposit' ? 'Dépôt' : 'Retrait';
+      const amountTd = document.createElement('td');
+      amountTd.textContent = `${item.type === 'deposit' ? '+' : '-'}${item.amount}€`;
+      amountTd.style.color = item.type === 'deposit' ? 'green' : 'red';
+      const dateTd = document.createElement('td');
+      dateTd.textContent = new Date(item.date).toLocaleDateString('fr-FR');
+      const descTd = document.createElement('td');
+      descTd.textContent = item.description || '';
+      tr.appendChild(typeTd);
+      tr.appendChild(amountTd);
+      tr.appendChild(dateTd);
+      tr.appendChild(descTd);
+      tbody.appendChild(tr);
+    });
+
+  pagination.innerHTML = '';
+  if (totalPages > 1) {
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      if (i === page) btn.classList.add('active');
+      btn.addEventListener('click', () => renderHistory(index, i));
+      pagination.appendChild(btn);
+    }
+  }
+}
 
 // Stub for refreshing bank accounts
 function updateBankAccounts() {

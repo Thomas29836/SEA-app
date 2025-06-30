@@ -116,14 +116,6 @@
   margin-bottom: 1rem;
 }
 
-/* Header on the settings page */
-.settings-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
 .home-title h1 {
   font-size: 1.25rem;
   font-weight: 700;
@@ -286,6 +278,34 @@
   gap: 0.5rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+/* History table */
+.history-section {
+  margin-top: 1rem;
+}
+
+#historyTable td:nth-child(2) {
+  font-weight: 700;
+}
+
+#historyPagination {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+#historyPagination button {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+}
+
+#historyPagination button.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
 }
 
 /* Header section inside pages */
