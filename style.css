@@ -22,15 +22,15 @@ h5 {
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
 }
 
 h3 {
-  font-size: 1.25rem;
+  font-size: clamp(1.125rem, 3.5vw, 1.25rem);
 }
 
     /* Header */
@@ -248,15 +248,16 @@ h3 {
     }
 
     /* Buttons */
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 0.75rem;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.2s;
-      font-size: 0.9rem;
-    }
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  min-height: 44px;
+}
 
     .btn-primary {
       background: #3b82f6;
@@ -708,20 +709,83 @@ h3 {
     }
 
     /* Responsive */
-    @media (max-width: 640px) {
-      .content {
-        padding: 0.75rem;
-      }
-      
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .form-actions {
-        flex-direction: column;
-      }
+@media (max-width: 640px) {
+  .content {
+    padding: 0.75rem;
+  }
 
-      .modal {
-        padding: 1.5rem;
-      }
-    }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cards-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions,
+  .money-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .modal {
+    padding: 1.5rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  /* Responsive history tables */
+  #historyTable,
+  #homeHistoryTable {
+    border: 0;
+  }
+
+  #historyTable thead,
+  #homeHistoryTable thead {
+    display: none;
+  }
+
+  #historyTable tr,
+  #homeHistoryTable tr {
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  #historyTable td,
+  #homeHistoryTable td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+  }
+
+  #historyTable td:nth-of-type(1)::before,
+  #homeHistoryTable td:nth-of-type(1)::before {
+    content: "Type";
+    font-weight: 600;
+  }
+
+  #historyTable td:nth-of-type(2)::before,
+  #homeHistoryTable td:nth-of-type(2)::before {
+    content: "Montant";
+    font-weight: 600;
+  }
+
+  #historyTable td:nth-of-type(3)::before,
+  #homeHistoryTable td:nth-of-type(3)::before {
+    content: "Date";
+    font-weight: 600;
+  }
+
+  #historyTable td:nth-of-type(4)::before,
+  #homeHistoryTable td:nth-of-type(4)::before {
+    content: "Description";
+    font-weight: 600;
+  }
+}
