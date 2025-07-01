@@ -885,7 +885,7 @@ function renderHistory(index = currentPocketIndex, page = 1) {
       typeTd.textContent = item.type === 'deposit' ? 'Dépôt' : 'Retrait';
       const amountTd = document.createElement('td');
       amountTd.textContent = `${item.type === 'deposit' ? '+' : '-'}${item.amount}€`;
-      amountTd.style.color = item.type === 'deposit' ? 'green' : 'red';
+      amountTd.className = item.type === 'deposit' ? 'tx-deposit' : 'tx-withdraw';
       const dateTd = document.createElement('td');
       dateTd.textContent = new Date(item.date).toLocaleDateString('fr-FR');
       const descTd = document.createElement('td');
@@ -1001,7 +1001,7 @@ function renderHomeHistory(page = 1) {
     typeTd.textContent = item.type === 'deposit' ? 'Dépôt' : 'Retrait';
     const amountTd = document.createElement('td');
     amountTd.textContent = `${item.type === 'deposit' ? '+' : '-'}${item.amount}€`;
-    amountTd.style.color = item.type === 'deposit' ? 'green' : 'red';
+    amountTd.className = item.type === 'deposit' ? 'tx-deposit' : 'tx-withdraw';
     const dateTd = document.createElement('td');
     dateTd.textContent = new Date(item.date).toLocaleDateString('fr-FR');
     const descTd = document.createElement('td');
