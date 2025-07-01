@@ -397,9 +397,19 @@ h3 {
       margin-top: 1.5rem;
     }
 
-    .form-actions .btn {
-      flex: 1;
-    }
+.form-actions .btn {
+  flex: 1;
+}
+
+/* Monthly amount input and calculate button */
+.monthly-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.monthly-group input {
+  flex: 1;
+}
 
     /* Table */
     .table-container {
@@ -746,6 +756,10 @@ h3 {
 
   .btn {
     width: 100%;
+  }
+
+  .monthly-group {
+    flex-direction: column-reverse;
   }
 
   /* Responsive history tables */
