@@ -150,6 +150,20 @@ h3 {
   margin-top: 0.25rem;
 }
 
+/* Pocket detail header overrides */
+#pocketDetail .home-header {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+}
+#pocketDetail .home-title {
+  flex: 1;
+  text-align: center;
+}
+#pocketDetail #detailName {
+  font-size: 1.5rem;
+}
+
     .stat-card {
       background: white;
       padding: 1rem;
@@ -190,7 +204,8 @@ h3 {
 .detail-actions {
   position: absolute;
   right: 0;
-  top: 0;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   gap: 0.5rem;
 }
@@ -216,6 +231,17 @@ h3 {
     .bank-card {
       grid-column: 1 / -1;
     }
+
+/* Pocket detail cards */
+#detailCards .stat-card {
+  display: inline-block;
+  justify-content: space-between;
+  align-items: center;
+}
+#detailCards .stat-card p {
+  font-size: 1rem;
+  font-weight: 400;
+}
 
     .pocket-card .progress {
       height: 100%;
