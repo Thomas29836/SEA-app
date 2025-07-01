@@ -368,6 +368,15 @@
     </div>
   </div>
   <!--JavaScript-->
- <script src="script.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+  const supabase = supabase.createClient(
+    'https://sumuxiqjpctmplgbbxom.supabase.co', // ← ton URL Supabase
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1bXV4aXFqcGN0bXBsZ2JieG9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzODI5MTIsImV4cCI6MjA2Njk1ODkxMn0.cpafK-cveQ_NuTNNR6-2KmzpJlwJSwb5BFyEWSVndLA'                    // ← ta clé publique
+  );
+</script>
+<script src="supabase.js"></script>
+<script src="js/script.js"></script>
+
 </body>
 </html>
