@@ -238,39 +238,39 @@
     <!-- Détail d'une poche d'épargne -->
     <div id="pocketDetail" class="page">
       <button type="button" class="btn btn-secondary" id="detailBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
-      <div class="detail-header">
-        <div class="detail-title">
+      <div class="home-header">
+        <div class="home-title">
           <h3 id="detailName"></h3>
-          <p id="detailMonthly" class="detail-monthly"></p>
+          <p id="detailMonthly" class="home-subtitle"></p>
         </div>
         <div class="detail-actions">
           <button type="button" id="detailEditBtn" class="icon-btn" title="Modifier">✏️</button>
           <button type="button" id="detailDeleteBtn" class="icon-btn delete" title="Supprimer">🗑️</button>
         </div>
       </div>
-      <div id="detailCards" class="detail-grid">
-        <div class="card">
+      <div id="detailCards" class="stats-grid">
+        <div class="stat-card">
           <h4>Montant épargné</h4>
           <p><strong id="detailSaved"></strong></p>
         </div>
-        <div class="card">
+        <div class="stat-card">
           <h4>Objectif</h4>
           <p><strong id="detailGoal"></strong></p>
           <p id="detailRemaining" class="warning"></p>
         </div>
-        <div class="card">
+        <div class="stat-card">
           <h4>Échéance</h4>
           <p id="detailDeadline"></p>
           <p id="detailMonthsLeft"></p>
         </div>
-        <div class="card">
+        <div class="stat-card">
           <h4>Statut</h4>
           <div class="progress">
             <div class="progress-bar" id="detailProgressBar"></div>
           </div>
           <p id="detailProgressPercent"></p>
         </div>
-        <div class="card">
+        <div class="stat-card">
           <h4>Comptes bancaires</h4>
           <p>Prélèvement : <span id="detailFrom"></span></p>
           <p>Destinataire : <span id="detailTo"></span></p>
