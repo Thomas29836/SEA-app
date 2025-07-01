@@ -620,6 +620,7 @@ function logout() {
         nameInput.focus();
         
         // Changer le bouton
+        editBtn.style.display = 'none';
         editBtn.innerHTML = '❌ Annuler';
         editBtn.classList.remove('btn-secondary');
         editBtn.classList.add('btn-primary');
@@ -647,10 +648,11 @@ function logout() {
       nameInput.disabled = true;
       emailInput.disabled = true;
       
-      // Restaurer le bouton
-      editBtn.innerHTML = '✏️ Modifier';
-      editBtn.classList.remove('btn-primary');
-      editBtn.classList.add('btn-secondary');
+// Restaurer le bouton
+editBtn.innerHTML = '✏️ Modifier';
+editBtn.classList.remove('btn-primary');
+editBtn.classList.add('btn-secondary');
+editBtn.style.display = '';
       
       // Masquer les boutons d'action
       formActions.style.display = 'none';
@@ -684,10 +686,11 @@ function logout() {
       nameInput.disabled = true;
       emailInput.disabled = true;
       
-      // Restaurer le bouton
-      editBtn.innerHTML = '✏️ Modifier';
-      editBtn.classList.remove('btn-primary');
-      editBtn.classList.add('btn-secondary');
+// Restaurer le bouton
+editBtn.innerHTML = '✏️ Modifier';
+editBtn.classList.remove('btn-primary');
+editBtn.classList.add('btn-secondary');
+editBtn.style.display = '';
       
       // Masquer les boutons d'action
       formActions.style.display = 'none';
