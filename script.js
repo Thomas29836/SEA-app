@@ -250,6 +250,7 @@ function showPocketDetail(index) {
   if (!pocket) return;
   currentPocketIndex = index;
   document.getElementById('detailName').textContent = pocket.name;
+  document.getElementById('detailMonthly').textContent = `${pocket.monthly}€/mois`;
   document.getElementById('detailSaved').textContent = pocket.saved + '€';
   document.getElementById('detailGoal').textContent = pocket.goal + '€';
   const remaining = Math.max(0, (pocket.goal || 0) - (pocket.saved || 0));
