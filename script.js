@@ -617,7 +617,8 @@ function resetSEA() {
 }
 
 // Déconnexion de l'utilisateur
-function logout() {
+async function logout() {
+  await supabase.auth.signOut();
   // Supprimer le flag de connexion
   localStorage.removeItem('isLoggedIn');
 
@@ -752,11 +753,19 @@ function isValidEmail(email) {
   return emailRegex.test(email);
 }
 
-// Gestion de la connexion simple
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+// Connexion via Supabase Auth
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
   e.preventDefault();
 
-  // Marquer la session comme active
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    alert('Erreur de connexion : ' + error.message);
+    return;
+  }
+
   localStorage.setItem('isLoggedIn', 'true');
 
   document.getElementById('loginPage').style.display = 'none';
@@ -782,10 +791,25 @@ document.getElementById('showLoginLink').addEventListener('click', function(e) {
   document.getElementById('loginPage').style.display = '';
 });
 
-// Gestion simple de l'inscription
-document.getElementById('registerForm').addEventListener('submit', function(e) {
+// Inscription via Supabase Auth
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  alert("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+
+  const name = document.getElementById('registerName').value.trim();
+  const email = document.getElementById('registerEmail').value.trim();
+  const password = document.getElementById('registerPassword').value;
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { name } }
+  });
+  if (error) {
+    alert("Erreur d'inscription : " + error.message);
+    return;
+  }
+
+  alert("Inscription réussie ! Vérifiez vos emails pour confirmer.");
   document.getElementById('registerPage').style.display = 'none';
   document.getElementById('loginPage').style.display = '';
 });
@@ -803,19 +827,26 @@ document.addEventListener('DOMContentLoaded', function() {
   const content = document.querySelector('.content');
   const loginPage = document.getElementById('loginPage');
   const registerPage = document.getElementById('registerPage');
-  if (localStorage.getItem('isLoggedIn') === 'true') {
-    if (navTabs) navTabs.style.display = 'flex';
-    if (content) content.style.display = '';
-    if (loginPage) loginPage.style.display = 'none';
-    if (registerPage) registerPage.style.display = 'none';
-    showPage(null, 'accueil');
-    document.querySelector('.nav-tab')?.classList.add('active');
-  } else {
-    if (navTabs) navTabs.style.display = 'none';
-    if (content) content.style.display = 'none';
-    if (loginPage) loginPage.style.display = '';
-    if (registerPage) registerPage.style.display = 'none';
-  }
+
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    const logged = !!session;
+    if (logged) localStorage.setItem('isLoggedIn', 'true');
+    else localStorage.removeItem('isLoggedIn');
+
+    if (logged) {
+      if (navTabs) navTabs.style.display = 'flex';
+      if (content) content.style.display = '';
+      if (loginPage) loginPage.style.display = 'none';
+      if (registerPage) registerPage.style.display = 'none';
+      showPage(null, 'accueil');
+      document.querySelector('.nav-tab')?.classList.add('active');
+    } else {
+      if (navTabs) navTabs.style.display = 'none';
+      if (content) content.style.display = 'none';
+      if (loginPage) loginPage.style.display = '';
+      if (registerPage) registerPage.style.display = 'none';
+    }
+  });
 
   // Initialiser l'état du SEA lors du chargement
   updateSeaStatus();
