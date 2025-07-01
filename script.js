@@ -443,10 +443,14 @@ function deletePocket(index) {
   }
 }
 
-function addMoney(index) {
-  const amount = parseFloat(prompt('Montant à ajouter :'));
+function addMoney(index, amount = null, description = null) {
+  if (amount === null) {
+    amount = parseFloat(prompt('Montant à ajouter :'));
+  }
   if (isNaN(amount) || amount <= 0) return;
-  const description = prompt('Description', 'épargne automatique') || '';
+  if (description === null) {
+    description = prompt('Description', 'épargne automatique') || '';
+  }
   const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   if (!pockets[index]) return;
   pockets[index].saved = (pockets[index].saved || 0) + amount;
@@ -465,10 +469,14 @@ function addMoney(index) {
   renderHomeHistory();
 }
 
-function withdrawMoney(index) {
-  const amount = parseFloat(prompt('Montant à retirer :'));
+function withdrawMoney(index, amount = null, description = null) {
+  if (amount === null) {
+    amount = parseFloat(prompt('Montant à retirer :'));
+  }
   if (isNaN(amount) || amount <= 0) return;
-  const description = prompt('Description (optionnel)') || '';
+  if (description === null) {
+    description = prompt('Description (optionnel)') || '';
+  }
   const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   if (!pockets[index]) return;
   pockets[index].saved = Math.max(0, (pockets[index].saved || 0) - amount);
@@ -486,6 +494,40 @@ function withdrawMoney(index) {
   updateTotals();
   renderHomeHistory();
 }
+
+
+function openMoneyForm(type) {
+  const modal = document.getElementById('moneyModal');
+  const form = document.getElementById('moneyForm');
+  if (!modal || !form) return;
+  form.dataset.type = type;
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('moneyModalTitle').textContent =
+    type === 'deposit' ? "Ajouter de l'argent" : "Retirer de l'argent";
+  form.reset();
+}
+
+function closeMoneyForm() {
+  const modal = document.getElementById('moneyModal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function submitMoneyForm(e) {
+  e.preventDefault();
+  const amount = parseFloat(document.getElementById('moneyAmount').value);
+  if (isNaN(amount) || amount <= 0) return;
+  const desc = document.getElementById('moneyDescription').value.trim();
+  const type = e.target.dataset.type;
+    if (type === 'withdraw') {
+      withdrawMoney(currentPocketIndex, amount, desc);
+    } else {
+      addMoney(currentPocketIndex, amount, desc);
+    }
+    closeMoneyForm();
+  }
 
 // Calcul automatique du montant mensuel
 function calculateMonthly() {
@@ -811,6 +853,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const settingsBackBtn = document.getElementById('settingsBackBtn');
     const addMoneyBtn = document.getElementById('addMoneyBtn');
     const withdrawMoneyBtn = document.getElementById('withdrawMoneyBtn');
+    const moneyForm = document.getElementById('moneyForm');
+    const cancelMoneyBtn = document.getElementById('cancelMoneyBtn');
+    const moneyModal = document.getElementById('moneyModal');
     if (editDetailBtn) {
       editDetailBtn.addEventListener('click', () => openPocketForm(currentPocketIndex));
     }
@@ -830,12 +875,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (addMoneyBtn) {
-      addMoneyBtn.addEventListener('click', () => addMoney(currentPocketIndex));
+      addMoneyBtn.addEventListener('click', () => openMoneyForm('deposit'));
     }
     if (withdrawMoneyBtn) {
-      withdrawMoneyBtn.addEventListener('click', () => withdrawMoney(currentPocketIndex));
+      withdrawMoneyBtn.addEventListener('click', () => openMoneyForm('withdraw'));
     }
-
   const modal = document.getElementById('pocketModal');
   if (modal) {
     modal.addEventListener('click', function(e) {
@@ -845,6 +889,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+    if (moneyForm) moneyForm.addEventListener('submit', submitMoneyForm);
+    if (cancelMoneyBtn) cancelMoneyBtn.addEventListener('click', closeMoneyForm);
+    if (moneyModal) {
+      moneyModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeMoneyForm();
+        }
+      });
+    }
   const addAccountBtn = document.getElementById('addAccountBtn');
   const accountForm = document.getElementById('accountForm');
   const cancelAccountBtn = document.getElementById('cancelAccountBtn');
@@ -1224,4 +1277,6 @@ window.deleteAccount = deleteAccount;
 window.goToSettings = goToSettings;
 window.addMoney = addMoney;
 window.withdrawMoney = withdrawMoney;
+window.openMoneyForm = openMoneyForm;
+window.closeMoneyForm = closeMoneyForm;
 window.renderHomeHistory = renderHomeHistory;
