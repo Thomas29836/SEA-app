@@ -942,14 +942,26 @@ function populateAccountSelects() {
       const opt = document.createElement('option');
       opt.value = acc.name;
       opt.textContent = label;
-      if (acc.color) opt.style.backgroundColor = acc.color;
+      if (acc.color) {
+        opt.style.backgroundImage = `radial-gradient(circle, ${acc.color} 40%, transparent 41%)`;
+        opt.style.backgroundPosition = '0.5rem center';
+        opt.style.backgroundSize = '0.6rem 0.6rem';
+        opt.style.backgroundRepeat = 'no-repeat';
+        opt.style.paddingLeft = '1.2rem';
+      }
       fromSelect.appendChild(opt);
     }
     if (acc.type === 'epargne' || acc.type === 'investissement') {
       const opt = document.createElement('option');
       opt.value = acc.name;
       opt.textContent = label;
-      if (acc.color) opt.style.backgroundColor = acc.color;
+      if (acc.color) {
+        opt.style.backgroundImage = `radial-gradient(circle, ${acc.color} 40%, transparent 41%)`;
+        opt.style.backgroundPosition = '0.5rem center';
+        opt.style.backgroundSize = '0.6rem 0.6rem';
+        opt.style.backgroundRepeat = 'no-repeat';
+        opt.style.paddingLeft = '1.2rem';
+      }
       toSelect.appendChild(opt);
     }
   });
