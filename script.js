@@ -666,8 +666,6 @@ async function resetSEA() {
 // Déconnexion de l'utilisateur
 async function logout() {
   await supabase.auth.signOut();
-  // Supprimer le flag de connexion
-  localStorage.removeItem('isLoggedIn');
   userId = null;
   pockets = [];
   accounts = [];
@@ -820,8 +818,6 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   userId = user.id;
   await initData();
 
-  localStorage.setItem('isLoggedIn', 'true');
-
   document.getElementById('loginPage').style.display = 'none';
   const navTabs = document.querySelector('.nav-tabs');
   if (navTabs) navTabs.style.display = 'flex';
@@ -884,8 +880,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   supabase.auth.getSession().then(({ data: { session } }) => {
     const logged = !!session;
-    if (logged) localStorage.setItem('isLoggedIn', 'true');
-    else localStorage.removeItem('isLoggedIn');
 
     if (logged) {
       userId = session.user.id;
