@@ -545,7 +545,7 @@ async function deletePocket(index) {
   }
 }
 
-async function addMoney(index, amount = null, description = null) {
+async function addMoney(index, amount = null, description = null, date = null) {
   if (amount === null) {
     amount = parseFloat(prompt('Montant à ajouter :'));
   }
@@ -557,10 +557,11 @@ async function addMoney(index, amount = null, description = null) {
   if (!pocket) return;
   const newSaved = (pocket.saved || 0) + amount;
   const history = pocket.history || [];
+  const txDate = date ? new Date(date).toISOString() : new Date().toISOString();
   history.unshift({
     type: 'deposit',
     amount,
-    date: new Date().toISOString(),
+    date: txDate,
     description
   });
   const { error, data: updated } = await supabase
@@ -579,7 +580,7 @@ async function addMoney(index, amount = null, description = null) {
   await promptMonthlyUpdate(index);
 }
 
-async function withdrawMoney(index, amount = null, description = null) {
+async function withdrawMoney(index, amount = null, description = null, date = null) {
   if (amount === null) {
     amount = parseFloat(prompt('Montant à retirer :'));
   }
@@ -591,10 +592,11 @@ async function withdrawMoney(index, amount = null, description = null) {
   if (!pocket) return;
   const newSaved = Math.max(0, (pocket.saved || 0) - amount);
   const history = pocket.history || [];
+  const txDate = date ? new Date(date).toISOString() : new Date().toISOString();
   history.unshift({
     type: 'withdraw',
     amount,
-    date: new Date().toISOString(),
+    date: txDate,
     description
   });
   const { error, data: updated } = await supabase
@@ -624,6 +626,10 @@ function openMoneyForm(type) {
   document.getElementById('moneyModalTitle').textContent =
     type === 'deposit' ? "Ajouter de l'argent" : "Retirer de l'argent";
   form.reset();
+  const dateInput = document.getElementById('moneyDate');
+  if (dateInput) {
+    dateInput.value = new Date().toISOString().substring(0, 10);
+  }
   if (remainingEl) {
     if (type === 'deposit') {
       const pocket = pockets[currentPocketIndex];
@@ -657,11 +663,13 @@ function submitMoneyForm(e) {
   const amount = parseFloat(document.getElementById('moneyAmount').value);
   if (isNaN(amount) || amount <= 0) return;
   const desc = document.getElementById('moneyDescription').value.trim();
+  const dateStr = document.getElementById('moneyDate').value;
   const type = e.target.dataset.type;
+  const date = dateStr ? new Date(dateStr).toISOString() : new Date().toISOString();
     if (type === 'withdraw') {
-      withdrawMoney(currentPocketIndex, amount, desc);
+      withdrawMoney(currentPocketIndex, amount, desc, date);
     } else {
-      addMoney(currentPocketIndex, amount, desc);
+      addMoney(currentPocketIndex, amount, desc, date);
     }
     closeMoneyForm();
   }
