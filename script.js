@@ -1014,6 +1014,12 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshAccountsBtn.addEventListener('click', openBankAccountsModal);
   }
 
+  // Mettre à jour les comptes destinataires lorsqu'on change le compte prélevé
+  const fromSelectEl = document.getElementById('pocketFrom');
+  if (fromSelectEl) {
+    fromSelectEl.addEventListener('change', populateAccountSelects);
+  }
+
   populateHistoryPocketFilter();
   renderHomeHistory();
   document.getElementById('historyTypeFilter')?.addEventListener('change', () => renderHomeHistory());
@@ -1151,45 +1157,72 @@ function populateAccountSelects() {
   const toSelect = document.getElementById('pocketTo');
   if (!fromSelect || !toSelect) return;
 
-  const prevFrom = fromSelect.value;
-  const prevTo = toSelect.value;
+  const selectedFrom = fromSelect.value; // valeur actuellement choisie
+  const selectedTo = toSelect.value;
 
+  // Réinitialiser les listes
   fromSelect.innerHTML = '<option value="">--Choisissez un compte--</option>';
   toSelect.innerHTML =
     '<option value="">--Choisissez le compte destinataire--</option>';
 
-  accounts.forEach(acc => {
-    const label = acc.bank ? `${acc.name} - ${acc.bank}` : acc.name;
-    if (acc.type === 'courant') {
-      const opt = document.createElement('option');
-      opt.value = acc.name;
-      opt.textContent = label;
-      if (acc.color) {
-        opt.style.backgroundImage = `radial-gradient(circle, ${acc.color} 40%, transparent 41%)`;
-        opt.style.backgroundPosition = '0.5rem center';
-        opt.style.backgroundSize = '0.6rem 0.6rem';
-        opt.style.backgroundRepeat = 'no-repeat';
-        opt.style.paddingLeft = '1.2rem';
-      }
-      fromSelect.appendChild(opt);
+  const categories = [
+    { type: 'courant', label: 'Compte courant' },
+    { type: 'epargne', label: 'Épargne' },
+    { type: 'investissement', label: 'Investissement' }
+  ];
+
+  // Fonction utilitaire pour appliquer la couleur à une option
+  const styleOption = (opt, color) => {
+    if (color) {
+      opt.style.backgroundImage = `radial-gradient(circle, ${color} 40%, transparent 41%)`;
+      opt.style.backgroundPosition = '0.5rem center';
+      opt.style.backgroundSize = '0.6rem 0.6rem';
+      opt.style.backgroundRepeat = 'no-repeat';
+      opt.style.paddingLeft = '1.2rem';
     }
-    if (acc.type === 'epargne' || acc.type === 'investissement') {
-      const opt = document.createElement('option');
-      opt.value = acc.name;
-      opt.textContent = label;
-      if (acc.color) {
-        opt.style.backgroundImage = `radial-gradient(circle, ${acc.color} 40%, transparent 41%)`;
-        opt.style.backgroundPosition = '0.5rem center';
-        opt.style.backgroundSize = '0.6rem 0.6rem';
-        opt.style.backgroundRepeat = 'no-repeat';
-        opt.style.paddingLeft = '1.2rem';
-      }
-      toSelect.appendChild(opt);
-    }
+  };
+
+  // Remplir la liste des comptes à prélever
+  categories.forEach(cat => {
+    const group = document.createElement('optgroup');
+    group.label = cat.label;
+    accounts
+      .filter(a => a.type === cat.type)
+      .forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.name;
+        opt.textContent = acc.bank ? `${acc.name} - ${acc.bank}` : acc.name;
+        styleOption(opt, acc.color);
+        group.appendChild(opt);
+      });
+    if (group.children.length) fromSelect.appendChild(group);
   });
 
-  if (prevFrom) fromSelect.value = prevFrom;
-  if (prevTo) toSelect.value = prevTo;
+  // Conserver la valeur de départ si possible
+  if (selectedFrom) fromSelect.value = selectedFrom;
+
+  const exclude = fromSelect.value; // compte à exclure côté destinataire
+
+  // Remplir la liste des comptes destinataires en excluant le compte prélevé
+  categories.forEach(cat => {
+    const group = document.createElement('optgroup');
+    group.label = cat.label;
+    accounts
+      .filter(a => a.type === cat.type && a.name !== exclude)
+      .forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.name;
+        opt.textContent = acc.bank ? `${acc.name} - ${acc.bank}` : acc.name;
+        styleOption(opt, acc.color);
+        group.appendChild(opt);
+      });
+    if (group.children.length) toSelect.appendChild(group);
+  });
+
+  // Restaurer la sélection du compte destinataire si elle reste valide
+  if (selectedTo && selectedTo !== exclude) {
+    toSelect.value = selectedTo;
+  }
 }
 
 function renderHomeHistory(page = 1) {
