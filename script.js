@@ -40,6 +40,13 @@ function monthsUntil(dateStr) {
   return months < 0 ? 0 : months;
 }
 
+// Format numbers with comma as thousands separator
+function formatNumber(value) {
+  const num = parseFloat(value);
+  if (isNaN(num)) return '0';
+  return num.toLocaleString('en-US');
+}
+
 async function loadPockets() {
   const { data, error } = await supabase
     .from('pockets')
@@ -77,9 +84,9 @@ function updateTotals() {
   const monthlyEl = document.getElementById('totalMonthlyAmount');
   const progressEl = document.getElementById('overallProgressPercent');
   const progressBarEl = document.getElementById('overallProgressBar');
-  if (savedEl) savedEl.textContent = `${totalSaved}€`;
-  if (goalsEl) goalsEl.textContent = `sur ${totalGoals}€ d'objectifs`;
-  if (monthlyEl) monthlyEl.textContent = `${totalMonthly}€/mois`;
+  if (savedEl) savedEl.textContent = `${formatNumber(totalSaved)}€`;
+  if (goalsEl) goalsEl.textContent = `sur ${formatNumber(totalGoals)}€ d'objectifs`;
+  if (monthlyEl) monthlyEl.textContent = `${formatNumber(totalMonthly)}€/mois`;
   const percent = totalGoals ? Math.min(100, (totalSaved / totalGoals) * 100) : 0;
   if (progressEl) progressEl.textContent = percent.toFixed(0) + '%';
   if (progressBarEl) progressBarEl.style.width = percent + '%';
@@ -214,7 +221,7 @@ function displayPockets() {
         title.textContent = pocket.name;
 
         const monthly = document.createElement('p');
-        monthly.textContent = `${pocket.monthly}€/mois`;
+        monthly.textContent = `${formatNumber(pocket.monthly)}€/mois`;
 
         const progressWrapper = document.createElement('div');
         progressWrapper.className = 'progress-wrapper';
@@ -239,7 +246,7 @@ function displayPockets() {
         savedLabel.textContent = 'Épargné';
         const savedAmount = document.createElement('p');
         savedAmount.className = 'saved-amount';
-        savedAmount.textContent = `${pocket.saved}€`;
+        savedAmount.textContent = `${formatNumber(pocket.saved)}€`;
         savedCol.appendChild(savedLabel);
         savedCol.appendChild(savedAmount);
 
@@ -248,7 +255,7 @@ function displayPockets() {
         goalLabel.textContent = 'Objectif';
         const goalAmount = document.createElement('p');
         goalAmount.className = 'goal-amount';
-        goalAmount.textContent = `${pocket.goal}€`;
+        goalAmount.textContent = `${formatNumber(pocket.goal)}€`;
         goalCol.appendChild(goalLabel);
         goalCol.appendChild(goalAmount);
 
@@ -278,11 +285,11 @@ function showPocketDetail(index) {
   if (!pocket) return;
   currentPocketIndex = index;
   document.getElementById('detailName').textContent = pocket.name;
-  document.getElementById('detailMonthly').textContent = `${pocket.monthly}€/mois`;
-  document.getElementById('detailSaved').textContent = pocket.saved + '€';
-  document.getElementById('detailGoal').textContent = pocket.goal + '€';
+  document.getElementById('detailMonthly').textContent = `${formatNumber(pocket.monthly)}€/mois`;
+  document.getElementById('detailSaved').textContent = formatNumber(pocket.saved) + '€';
+  document.getElementById('detailGoal').textContent = formatNumber(pocket.goal) + '€';
   const remaining = Math.max(0, (pocket.goal || 0) - (pocket.saved || 0));
-  document.getElementById('detailRemaining').textContent = remaining > 0 ? `${remaining}€ restants` : 'Objectif atteint';
+  document.getElementById('detailRemaining').textContent = remaining > 0 ? `${formatNumber(remaining)}€ restants` : 'Objectif atteint';
   document.getElementById('detailDeadline').textContent = formatDateDisplay(pocket.deadline);
   const monthsLeft = monthsUntil(pocket.deadline);
   document.getElementById('detailMonthsLeft').textContent = monthsLeft > 0 ? `${monthsLeft} mois restants` : 'Échéance atteinte';
@@ -309,7 +316,7 @@ function renderPockets() {
     title.textContent = pocket.name;
 
     const monthly = document.createElement('p');
-    monthly.textContent = `${pocket.monthly}€/mois`;
+    monthly.textContent = `${formatNumber(pocket.monthly)}€/mois`;
 
     const progressWrapper = document.createElement('div');
     progressWrapper.className = 'progress-wrapper';
@@ -334,7 +341,7 @@ function renderPockets() {
     savedLabel.textContent = 'Épargné';
     const savedAmount = document.createElement('p');
     savedAmount.className = 'saved-amount';
-    savedAmount.textContent = `${pocket.saved}€`;
+    savedAmount.textContent = `${formatNumber(pocket.saved)}€`;
     savedCol.appendChild(savedLabel);
     savedCol.appendChild(savedAmount);
 
@@ -343,7 +350,7 @@ function renderPockets() {
     goalLabel.textContent = 'Objectif';
     const goalAmount = document.createElement('p');
     goalAmount.className = 'goal-amount';
-    goalAmount.textContent = `${pocket.goal}€`;
+    goalAmount.textContent = `${formatNumber(pocket.goal)}€`;
     goalCol.appendChild(goalLabel);
     goalCol.appendChild(goalAmount);
 
@@ -1060,7 +1067,7 @@ function renderHistory(index = currentPocketIndex, page = 1) {
       const typeTd = document.createElement('td');
       typeTd.textContent = item.type === 'deposit' ? 'Dépôt' : 'Retrait';
       const amountTd = document.createElement('td');
-      amountTd.textContent = `${item.type === 'deposit' ? '+' : '-'}${item.amount}€`;
+      amountTd.textContent = `${item.type === 'deposit' ? '+' : '-'}${formatNumber(item.amount)}€`;
       amountTd.className = item.type === 'deposit' ? 'tx-deposit' : 'tx-withdraw';
       const dateTd = document.createElement('td');
       dateTd.textContent = new Date(item.date).toLocaleDateString('fr-FR');
@@ -1167,9 +1174,9 @@ function renderHomeHistory(page = 1) {
   const depositsEl = document.getElementById('historyDeposits');
   const withdrawalsEl = document.getElementById('historyWithdrawals');
   const netEl = document.getElementById('historyNet');
-  if (depositsEl) depositsEl.textContent = `${totalDeposits}€`;
-  if (withdrawalsEl) withdrawalsEl.textContent = `${totalWithdrawals}€`;
-  if (netEl) netEl.textContent = `${net}€`;
+  if (depositsEl) depositsEl.textContent = `${formatNumber(totalDeposits)}€`;
+  if (withdrawalsEl) withdrawalsEl.textContent = `${formatNumber(totalWithdrawals)}€`;
+  if (netEl) netEl.textContent = `${formatNumber(net)}€`;
 
   const tbody = document.querySelector('#homeHistoryTable tbody');
   const pagination = document.getElementById('homeHistoryPagination');
@@ -1185,7 +1192,7 @@ function renderHomeHistory(page = 1) {
     const typeTd = document.createElement('td');
     typeTd.textContent = item.type === 'deposit' ? 'Dépôt' : 'Retrait';
     const amountTd = document.createElement('td');
-    amountTd.textContent = `${item.type === 'deposit' ? '+' : '-'}${item.amount}€`;
+    amountTd.textContent = `${item.type === 'deposit' ? '+' : '-'}${formatNumber(item.amount)}€`;
     amountTd.className = item.type === 'deposit' ? 'tx-deposit' : 'tx-withdraw';
     const dateTd = document.createElement('td');
     dateTd.textContent = new Date(item.date).toLocaleDateString('fr-FR');
@@ -1235,7 +1242,7 @@ function updateAccountsSummary(accounts) {
   const totalEl = document.getElementById('accountsTotal');
   const total = accounts.reduce((s, a) => s + (a.balance || 0), 0);
   if (countEl) countEl.textContent = accounts.length;
-  if (totalEl) totalEl.textContent = total + '€';
+  if (totalEl) totalEl.textContent = formatNumber(total) + '€';
 }
 
 function renderAccounts() {
@@ -1253,7 +1260,7 @@ function renderAccounts() {
     const name = document.createElement('span');
     name.textContent = acc.name;
     const balance = document.createElement('span');
-    balance.textContent = acc.balance + '€';
+    balance.textContent = formatNumber(acc.balance) + '€';
     const type = document.createElement('span');
     type.textContent = acc.type;
     info.appendChild(color);
