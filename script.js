@@ -78,7 +78,9 @@ async function initData() {
 function updateTotals() {
   const totalSaved = pockets.reduce((sum, p) => sum + (p.saved || 0), 0);
   const totalGoals = pockets.reduce((sum, p) => sum + (p.goal || 0), 0);
-  const totalMonthly = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+  const totalMonthly = pockets
+    .filter(p => !(p.goal && p.saved >= p.goal))
+    .reduce((sum, p) => sum + (p.monthly || 0), 0);
   const savedEl = document.getElementById('totalSavedAmount');
   const goalsEl = document.getElementById('totalGoalsAmount');
   const monthlyEl = document.getElementById('totalMonthlyAmount');
@@ -974,6 +976,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (logged) {
       userId = session.user.id;
+      setUserInfoFields(session.user);
       initData();
       if (navTabs) navTabs.style.display = 'flex';
       if (content) content.style.display = '';
