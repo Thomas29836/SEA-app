@@ -1,6 +1,9 @@
  // Variable pour suivre l'état du SEA
 let seaActive = false;
 let currentPocketIndex = -1;
+let userId = null;
+let pockets = [];
+let accounts = [];
 const accountColors = [
   '#f87171',
   '#fb923c',
@@ -37,8 +40,35 @@ function monthsUntil(dateStr) {
   return months < 0 ? 0 : months;
 }
 
+async function loadPockets() {
+  const { data, error } = await supabase
+    .from('pockets')
+    .select('*')
+    .eq('user_id', userId)
+    .order('id');
+  pockets = error ? [] : data || [];
+}
+
+async function loadAccounts() {
+  const { data, error } = await supabase
+    .from('accounts')
+    .select('*')
+    .eq('user_id', userId)
+    .order('id');
+  accounts = error ? [] : data || [];
+}
+
+async function initData() {
+  await Promise.all([loadPockets(), loadAccounts()]);
+  updateTotals();
+  displayPockets();
+  renderPockets();
+  populateAccountSelects();
+  populateHistoryPocketFilter();
+  renderHomeHistory();
+}
+
 function updateTotals() {
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   const totalSaved = pockets.reduce((sum, p) => sum + (p.saved || 0), 0);
   const totalGoals = pockets.reduce((sum, p) => sum + (p.goal || 0), 0);
   const totalMonthly = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
@@ -168,12 +198,11 @@ if (seaForm) {
       alert('SEA réactivé avec succès !');
     }
 
-    // Afficher les poches d'épargne depuis localStorage
+    // Afficher les poches d'épargne depuis Supabase
 function displayPockets() {
       const container = document.getElementById('pocketsContainer');
       if (!container) return;
       container.innerHTML = '';
-      const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
 
         pockets.forEach((pocket, index) => {
           const card = document.createElement('div');
@@ -245,7 +274,6 @@ function displayPockets() {
 }
 
 function showPocketDetail(index) {
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   const pocket = pockets[index];
   if (!pocket) return;
   currentPocketIndex = index;
@@ -271,7 +299,6 @@ function renderPockets() {
   const container = document.getElementById('pocketsConfigContainer');
   if (!container) return;
   container.innerHTML = '';
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
 
   pockets.forEach((pocket, index) => {
     const card = document.createElement('div');
@@ -367,7 +394,6 @@ function openPocketForm(index = -1) {
   form.dataset.returnTo = detailActive ? 'detail' : 'home';
 
   if (index > -1) {
-    const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
     const p = pockets[index];
     if (p) {
       document.getElementById('pocketName').value = p.name || '';
@@ -388,9 +414,8 @@ function closePocketForm() {
   document.body.style.overflow = '';
 }
 
-function savePocket(e) {
+async function savePocket(e) {
   e.preventDefault();
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   const index = parseInt(e.target.dataset.index, 10);
 
   const returnTo = e.target.dataset.returnTo || 'home';
@@ -406,13 +431,21 @@ function savePocket(e) {
 
   if (index >= 0 && pockets[index]) {
     data.saved = pockets[index].saved || 0;
-    pockets[index] = { ...pockets[index], ...data };
+    const { error } = await supabase
+      .from('pockets')
+      .update({ ...data })
+      .eq('id', pockets[index].id);
+    if (!error) pockets[index] = { ...pockets[index], ...data };
   } else {
     data.saved = 0;
-    pockets.push(data);
+    const { data: created, error } = await supabase
+      .from('pockets')
+      .insert([{ ...data, user_id: userId, history: [] }])
+      .select()
+      .single();
+    if (!error && created) pockets.push(created);
   }
 
-  localStorage.setItem('pockets', JSON.stringify(pockets));
   closePocketForm();
   displayPockets();
   renderPockets();
@@ -428,11 +461,12 @@ function savePocket(e) {
   }
 }
 
-function deletePocket(index) {
+async function deletePocket(index) {
   if (!confirm('Supprimer cette poche ?')) return;
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
-  pockets.splice(index, 1);
-  localStorage.setItem('pockets', JSON.stringify(pockets));
+  const pocket = pockets[index];
+  if (!pocket) return;
+  const { error } = await supabase.from('pockets').delete().eq('id', pocket.id);
+  if (!error) pockets.splice(index, 1);
   displayPockets();
   renderPockets();
   populateHistoryPocketFilter();
@@ -443,7 +477,7 @@ function deletePocket(index) {
   }
 }
 
-function addMoney(index, amount = null, description = null) {
+async function addMoney(index, amount = null, description = null) {
   if (amount === null) {
     amount = parseFloat(prompt('Montant à ajouter :'));
   }
@@ -451,17 +485,23 @@ function addMoney(index, amount = null, description = null) {
   if (description === null) {
     description = prompt('Description', 'épargne automatique') || '';
   }
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
-  if (!pockets[index]) return;
-  pockets[index].saved = (pockets[index].saved || 0) + amount;
-  pockets[index].history = pockets[index].history || [];
-  pockets[index].history.unshift({
+  const pocket = pockets[index];
+  if (!pocket) return;
+  const newSaved = (pocket.saved || 0) + amount;
+  const history = pocket.history || [];
+  history.unshift({
     type: 'deposit',
     amount,
     date: new Date().toISOString(),
     description
   });
-  localStorage.setItem('pockets', JSON.stringify(pockets));
+  const { error, data: updated } = await supabase
+    .from('pockets')
+    .update({ saved: newSaved, history })
+    .eq('id', pocket.id)
+    .select()
+    .single();
+  if (!error && updated) pockets[index] = updated;
   showPocketDetail(index);
   displayPockets();
   renderPockets();
@@ -469,7 +509,7 @@ function addMoney(index, amount = null, description = null) {
   renderHomeHistory();
 }
 
-function withdrawMoney(index, amount = null, description = null) {
+async function withdrawMoney(index, amount = null, description = null) {
   if (amount === null) {
     amount = parseFloat(prompt('Montant à retirer :'));
   }
@@ -477,17 +517,23 @@ function withdrawMoney(index, amount = null, description = null) {
   if (description === null) {
     description = prompt('Description (optionnel)') || '';
   }
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
-  if (!pockets[index]) return;
-  pockets[index].saved = Math.max(0, (pockets[index].saved || 0) - amount);
-  pockets[index].history = pockets[index].history || [];
-  pockets[index].history.unshift({
+  const pocket = pockets[index];
+  if (!pocket) return;
+  const newSaved = Math.max(0, (pocket.saved || 0) - amount);
+  const history = pocket.history || [];
+  history.unshift({
     type: 'withdraw',
     amount,
     date: new Date().toISOString(),
     description
   });
-  localStorage.setItem('pockets', JSON.stringify(pockets));
+  const { error, data: updated } = await supabase
+    .from('pockets')
+    .update({ saved: newSaved, history })
+    .eq('id', pocket.id)
+    .select()
+    .single();
+  if (!error && updated) pockets[index] = updated;
   showPocketDetail(index);
   displayPockets();
   renderPockets();
@@ -571,12 +617,13 @@ function setPocketName(name) {
       }
 
     // Fonctions pour les paramètres
-function resetSEA() {
+async function resetSEA() {
   if (confirm('Êtes-vous sûr de vouloir réinitialiser votre SEA ?')) {
-    // Nettoyer le stockage local
-    localStorage.removeItem('pockets');
-    localStorage.removeItem('pocketDates');
-    localStorage.removeItem('history');
+    // Supprimer les données de l'utilisateur dans Supabase
+    await supabase.from('pockets').delete().eq('user_id', userId);
+    await supabase.from('accounts').delete().eq('user_id', userId);
+    pockets = [];
+    accounts = [];
 
     // Remise à zéro des paramètres du SEA
     seaActive = false;
@@ -621,6 +668,9 @@ async function logout() {
   await supabase.auth.signOut();
   // Supprimer le flag de connexion
   localStorage.removeItem('isLoggedIn');
+  userId = null;
+  pockets = [];
+  accounts = [];
 
   // Masquer les sections réservées aux utilisateurs connectés
   const navTabs = document.querySelector('.nav-tabs');
@@ -766,6 +816,10 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     return;
   }
 
+  const { data: { user } } = await supabase.auth.getUser();
+  userId = user.id;
+  await initData();
+
   localStorage.setItem('isLoggedIn', 'true');
 
   document.getElementById('loginPage').style.display = 'none';
@@ -834,6 +888,8 @@ document.addEventListener('DOMContentLoaded', function() {
     else localStorage.removeItem('isLoggedIn');
 
     if (logged) {
+      userId = session.user.id;
+      initData();
       if (navTabs) navTabs.style.display = 'flex';
       if (content) content.style.display = '';
       if (loginPage) loginPage.style.display = 'none';
@@ -850,9 +906,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initialiser l'état du SEA lors du chargement
   updateSeaStatus();
-  displayPockets();
-  renderPockets();
-  populateAccountSelects();
 
   const addBtn = document.getElementById('addPocketBtn');
   const form = document.getElementById('pocketForm');
@@ -949,7 +1002,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Afficher l'historique des transactions pour une poche
 function renderHistory(index = currentPocketIndex, page = 1) {
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   const pocket = pockets[index];
   if (!pocket) return;
 
@@ -997,7 +1049,6 @@ function renderHistory(index = currentPocketIndex, page = 1) {
 function populateHistoryPocketFilter() {
   const select = document.getElementById('historyPocketFilter');
   if (!select) return;
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
   select.innerHTML = '<option value="all">Toutes les poches</option>';
   pockets.forEach((p, i) => {
     const opt = document.createElement('option');
@@ -1019,7 +1070,6 @@ function populateAccountSelects() {
   toSelect.innerHTML =
     '<option value="">--Choisissez le compte destinataire--</option>';
 
-  const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
   accounts.forEach(acc => {
     const label = acc.bank ? `${acc.name} - ${acc.bank}` : acc.name;
     if (acc.type === 'courant') {
@@ -1057,7 +1107,6 @@ function populateAccountSelects() {
 function renderHomeHistory(page = 1) {
   const typeFilter = document.getElementById('historyTypeFilter')?.value || 'all';
   const pocketFilter = document.getElementById('historyPocketFilter')?.value || 'all';
-  const pockets = JSON.parse(localStorage.getItem('pockets') || '[]');
 
   let txs = [];
   pockets.forEach((p, index) => {
@@ -1153,7 +1202,6 @@ function updateAccountsSummary(accounts) {
 function renderAccounts() {
   const listEl = document.getElementById('accountsList');
   if (!listEl) return;
-  const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
   listEl.innerHTML = '';
   accounts.forEach((acc, i) => {
     const item = document.createElement('div');
@@ -1218,8 +1266,7 @@ function openAccountForm(index = -1) {
   form.dataset.index = index;
   form.reset();
   renderAccountColors();
-  if (index >= 0) {
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+   if (index >= 0) {
     const a = accounts[index];
     if (a) {
       document.getElementById('accountName').value = a.name;
@@ -1241,10 +1288,9 @@ function closeAccountForm() {
   }
 }
 
-function saveAccount(e) {
+async function saveAccount(e) {
   e.preventDefault();
   const form = e.target;
-  const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
   const index = parseInt(form.dataset.index, 10);
   const colorInput = document.querySelector('input[name="accountColor"]:checked');
   const data = {
@@ -1255,21 +1301,30 @@ function saveAccount(e) {
     color: colorInput ? colorInput.value : accountColors[0]
   };
   if (index >= 0) {
-    accounts[index] = data;
+    const { error } = await supabase
+      .from('accounts')
+      .update({ ...data })
+      .eq('id', accounts[index].id);
+    if (!error) accounts[index] = { ...accounts[index], ...data };
   } else {
-    accounts.push(data);
+    const { data: created, error } = await supabase
+      .from('accounts')
+      .insert([{ ...data, user_id: userId }])
+      .select()
+      .single();
+    if (!error && created) accounts.push(created);
   }
-  localStorage.setItem('accounts', JSON.stringify(accounts));
   closeAccountForm();
   renderAccounts();
   populateAccountSelects();
 }
 
-function deleteAccount(index) {
+async function deleteAccount(index) {
   if (!confirm('Supprimer ce compte ?')) return;
-  const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-  accounts.splice(index, 1);
-  localStorage.setItem('accounts', JSON.stringify(accounts));
+  const account = accounts[index];
+  if (!account) return;
+  const { error } = await supabase.from('accounts').delete().eq('id', account.id);
+  if (!error) accounts.splice(index, 1);
   renderAccounts();
   populateAccountSelects();
 }
