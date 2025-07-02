@@ -1371,12 +1371,12 @@ function renderAccounts() {
     info.appendChild(balance);
     info.appendChild(type);
     const actions = document.createElement('div');
-    const edit = document.createElement('button');
-    edit.className = 'btn btn-secondary btn-sm';
+     const edit = document.createElement('button');
+    edit.className = 'icon-btn';
     edit.textContent = '✏️';
     edit.addEventListener('click', () => openAccountForm(i));
     const del = document.createElement('button');
-    del.className = 'btn btn-danger btn-sm';
+    del.className = 'icon-btn delete';
     del.textContent = '🗑️';
     del.addEventListener('click', () => deleteAccount(i));
     actions.appendChild(edit);
