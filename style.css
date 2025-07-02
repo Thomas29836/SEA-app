@@ -479,7 +479,7 @@ h3 {
 }
 
 .progress-inner {
-  background: #3b82f6;
+  background: #000;
   height: 100%;
   width: 0;
   transition: width 0.3s ease;
@@ -487,7 +487,7 @@ h3 {
 
 /* Generic progress bar element */
 .progress-bar {
-  background: #3b82f6;
+  background: #000;
   height: 100%;
   width: 0;
   transition: width 0.3s ease;
@@ -802,4 +802,55 @@ h3 {
     content: "Description";
     font-weight: 600;
   }
+}
+
+/* Custom color updates */
+
+/* Home screen buttons */
+#homeAddPocketBtn {
+  background: #000;
+  color: #fff;
+}
+#homeAddPocketBtn .btn-plus {
+  color: #fff;
+  margin-right: 0.25rem;
+  font-weight: 700;
+}
+#homeAddPocketBtn:hover {
+  background: #000;
+}
+
+#refreshAccountsBtn {
+  background: #fff;
+  color: #475569;
+  border: 1px solid #d1d5db;
+}
+#refreshAccountsBtn:hover {
+  background: #f8fafc;
+}
+
+/* Account modal add account button */
+#addAccountBtn {
+  background: #000;
+  color: #fff;
+}
+#addAccountBtn:hover {
+  background: #000;
+}
+
+/* Buttons inside form actions */
+.form-actions .btn-primary {
+  background: #000;
+  color: #fff;
+}
+.form-actions .btn-primary:hover {
+  background: #000;
+}
+.form-actions .btn-secondary {
+  background: #fff;
+  color: #475569;
+  border: 1px solid #d1d5db;
+}
+.form-actions .btn-secondary:hover {
+  background: #f8fafc;
 }
