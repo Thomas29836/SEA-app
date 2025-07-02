@@ -586,6 +586,7 @@ async function withdrawMoney(index, amount = null, description = null) {
 function openMoneyForm(type) {
   const modal = document.getElementById('moneyModal');
   const form = document.getElementById('moneyForm');
+  const remainingEl = document.getElementById('moneyRemaining');
   if (!modal || !form) return;
   form.dataset.type = type;
   modal.classList.add('active');
@@ -593,6 +594,25 @@ function openMoneyForm(type) {
   document.getElementById('moneyModalTitle').textContent =
     type === 'deposit' ? "Ajouter de l'argent" : "Retirer de l'argent";
   form.reset();
+  if (remainingEl) {
+    if (type === 'deposit') {
+      const pocket = pockets[currentPocketIndex];
+      if (pocket && pocket.goal) {
+        const remaining = Math.max(0, pocket.goal - (pocket.saved || 0));
+        remainingEl.textContent =
+          remaining <= 0
+            ? 'Objectif déjà atteint'
+            : `Il reste ${formatNumber(remaining)}€ avant d\'atteindre l\'objectif`;
+        remainingEl.style.display = 'block';
+      } else {
+        remainingEl.textContent = '';
+        remainingEl.style.display = 'none';
+      }
+    } else {
+      remainingEl.textContent = '';
+      remainingEl.style.display = 'none';
+    }
+  }
 }
 
 function closeMoneyForm() {
