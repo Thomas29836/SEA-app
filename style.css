@@ -663,25 +663,70 @@ h3 {
 
 .account-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.account-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .account-color {
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.account-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.account-bank {
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.account-money {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.account-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.account-balance {
+  font-weight: 700;
+  color: #000;
+}
+
+.account-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-top: 0.25rem;
+}
+
+.account-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
 }
 
 .color-options {

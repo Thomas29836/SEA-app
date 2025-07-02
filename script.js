@@ -1363,23 +1363,40 @@ function renderAccounts() {
   accounts.forEach((acc, i) => {
     const item = document.createElement('div');
     item.className = 'account-item';
-    const info = document.createElement('div');
-    info.className = 'account-info';
+
     const color = document.createElement('span');
     color.className = 'account-color';
     color.style.backgroundColor = acc.color;
+    item.appendChild(color);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'account-wrapper';
+
+    const info = document.createElement('div');
+    info.className = 'account-info';
     const name = document.createElement('span');
+    name.className = 'account-name';
     name.textContent = acc.name;
-    const balance = document.createElement('span');
-    balance.textContent = formatNumber(acc.balance) + '€';
-    const type = document.createElement('span');
-    type.textContent = acc.type;
-    info.appendChild(color);
+    const bank = document.createElement('span');
+    bank.className = 'account-bank';
+    bank.textContent = acc.bank;
     info.appendChild(name);
-    info.appendChild(balance);
-    info.appendChild(type);
+    info.appendChild(bank);
+
+    const money = document.createElement('div');
+    money.className = 'account-money';
+    const balance = document.createElement('span');
+    balance.className = 'account-balance';
+    balance.textContent = formatNumber(acc.balance) + '€';
+    const badge = document.createElement('span');
+    badge.className = 'account-badge';
+    badge.textContent = acc.type;
+    money.appendChild(balance);
+    money.appendChild(badge);
+
     const actions = document.createElement('div');
-     const edit = document.createElement('button');
+    actions.className = 'account-actions';
+    const edit = document.createElement('button');
     edit.className = 'icon-btn';
     edit.textContent = '✏️';
     edit.addEventListener('click', () => openAccountForm(i));
@@ -1389,8 +1406,12 @@ function renderAccounts() {
     del.addEventListener('click', () => deleteAccount(i));
     actions.appendChild(edit);
     actions.appendChild(del);
-    item.appendChild(info);
-    item.appendChild(actions);
+
+    wrapper.appendChild(info);
+    wrapper.appendChild(money);
+    wrapper.appendChild(actions);
+
+    item.appendChild(wrapper);
     listEl.appendChild(item);
   });
   updateAccountsSummary(accounts);
