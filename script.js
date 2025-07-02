@@ -713,6 +713,15 @@ async function logout() {
     let originalUserData = {};
     let isEditingUser = false;
 
+    function setUserInfoFields(user) {
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      if (!nameInput || !emailInput || !user) return;
+      nameInput.value = user.user_metadata?.name || '';
+      emailInput.value = user.email || '';
+      originalUserData = { name: nameInput.value, email: emailInput.value };
+    }
+
     function toggleUserEdit() {
       const nameInput = document.getElementById('name');
       const emailInput = document.getElementById('email');
@@ -836,6 +845,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
   const { data: { user } } = await supabase.auth.getUser();
   userId = user.id;
+  setUserInfoFields(user);
   await initData();
 
   document.getElementById('loginPage').style.display = 'none';
@@ -901,9 +911,10 @@ document.addEventListener('DOMContentLoaded', function() {
   supabase.auth.getSession().then(({ data: { session } }) => {
     const logged = !!session;
 
-    if (logged) {
-      userId = session.user.id;
-      initData();
+      if (logged) {
+        userId = session.user.id;
+        setUserInfoFields(session.user);
+        initData();
       if (navTabs) navTabs.style.display = 'flex';
       if (content) content.style.display = '';
       if (loginPage) loginPage.style.display = 'none';
