@@ -435,7 +435,12 @@ async function savePocket(e) {
       .from('pockets')
       .update({ ...data })
       .eq('id', pockets[index].id);
-    if (!error) pockets[index] = { ...pockets[index], ...data };
+    if (error) {
+      alert("Erreur lors de l'enregistrement de la poche");
+      console.error('Supabase error', error);
+      return;
+    }
+    pockets[index] = { ...pockets[index], ...data };
   } else {
     data.saved = 0;
     const { data: created, error } = await supabase
@@ -443,7 +448,12 @@ async function savePocket(e) {
       .insert([{ ...data, user_id: userId, history: [] }])
       .select()
       .single();
-    if (!error && created) pockets.push(created);
+    if (error) {
+      alert("Erreur lors de la création de la poche");
+      console.error('Supabase error', error);
+      return;
+    }
+    if (created) pockets.push(created);
   }
 
   closePocketForm();
@@ -466,7 +476,12 @@ async function deletePocket(index) {
   const pocket = pockets[index];
   if (!pocket) return;
   const { error } = await supabase.from('pockets').delete().eq('id', pocket.id);
-  if (!error) pockets.splice(index, 1);
+  if (error) {
+    alert("Erreur lors de la suppression de la poche");
+    console.error('Supabase error', error);
+    return;
+  }
+  pockets.splice(index, 1);
   displayPockets();
   renderPockets();
   populateHistoryPocketFilter();
@@ -620,8 +635,13 @@ function setPocketName(name) {
 async function resetSEA() {
   if (confirm('Êtes-vous sûr de vouloir réinitialiser votre SEA ?')) {
     // Supprimer les données de l'utilisateur dans Supabase
-    await supabase.from('pockets').delete().eq('user_id', userId);
-    await supabase.from('accounts').delete().eq('user_id', userId);
+    const { error: pocketError } = await supabase.from('pockets').delete().eq('user_id', userId);
+    const { error: accountError } = await supabase.from('accounts').delete().eq('user_id', userId);
+    if (pocketError || accountError) {
+      alert('Erreur lors de la réinitialisation du SEA');
+      console.error('Supabase error', pocketError || accountError);
+      return;
+    }
     pockets = [];
     accounts = [];
 
@@ -1299,14 +1319,24 @@ async function saveAccount(e) {
       .from('accounts')
       .update({ ...data })
       .eq('id', accounts[index].id);
-    if (!error) accounts[index] = { ...accounts[index], ...data };
+    if (error) {
+      alert("Erreur lors de l'enregistrement du compte");
+      console.error('Supabase error', error);
+      return;
+    }
+    accounts[index] = { ...accounts[index], ...data };
   } else {
     const { data: created, error } = await supabase
       .from('accounts')
       .insert([{ ...data, user_id: userId }])
       .select()
       .single();
-    if (!error && created) accounts.push(created);
+    if (error) {
+      alert("Erreur lors de la création du compte");
+      console.error('Supabase error', error);
+      return;
+    }
+    if (created) accounts.push(created);
   }
   closeAccountForm();
   renderAccounts();
@@ -1318,7 +1348,12 @@ async function deleteAccount(index) {
   const account = accounts[index];
   if (!account) return;
   const { error } = await supabase.from('accounts').delete().eq('id', account.id);
-  if (!error) accounts.splice(index, 1);
+  if (error) {
+    alert("Erreur lors de la suppression du compte");
+    console.error('Supabase error', error);
+    return;
+  }
+  accounts.splice(index, 1);
   renderAccounts();
   populateAccountSelects();
 }
