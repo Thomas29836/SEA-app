@@ -112,6 +112,32 @@ function checkGoalCompletion(index) {
   }
 }
 
+// Offer to update monthly amount after a change in savings
+async function promptMonthlyUpdate(index) {
+  const pocket = pockets[index];
+  if (!pocket || !pocket.goal || !pocket.deadline) return;
+  const remaining = Math.max(0, (pocket.goal || 0) - (pocket.saved || 0));
+  const months = monthsUntil(pocket.deadline) || 1;
+  if (remaining <= 0 || months <= 0) return;
+  const newMonthly = Math.ceil(remaining / months);
+  if (newMonthly === pocket.monthly) return;
+  if (confirm(`Mettre à jour le montant mensuel à ${formatNumber(newMonthly)}€ ?`)) {
+    const { error } = await supabase
+      .from('pockets')
+      .update({ monthly: newMonthly })
+      .eq('id', pocket.id);
+    if (!error) {
+      pocket.monthly = newMonthly;
+      showPocketDetail(index);
+      displayPockets();
+      renderPockets();
+      updateTotals();
+    } else {
+      alert("Erreur lors de la mise à jour du montant mensuel");
+    }
+  }
+}
+
     // Navigation entre les pages
 function showPage(evt, pageId) {
   // Masquer toutes les pages
@@ -550,6 +576,7 @@ async function addMoney(index, amount = null, description = null) {
   checkGoalCompletion(index);
   updateTotals();
   renderHomeHistory();
+  await promptMonthlyUpdate(index);
 }
 
 async function withdrawMoney(index, amount = null, description = null) {
@@ -582,6 +609,7 @@ async function withdrawMoney(index, amount = null, description = null) {
   renderPockets();
   updateTotals();
   renderHomeHistory();
+  await promptMonthlyUpdate(index);
 }
 
 
