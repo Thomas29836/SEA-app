@@ -781,7 +781,7 @@ editBtn.style.display = '';
       isEditingUser = false;
     }
 
-    function saveUserInfo() {
+    async function saveUserInfo() {
       const nameInput = document.getElementById('name');
       const emailInput = document.getElementById('email');
       const editBtn = document.getElementById('editUserBtn');
@@ -800,29 +800,39 @@ editBtn.style.display = '';
         return;
       }
 
-      // Simulation de sauvegarde
+      // Mise à jour des informations dans Supabase
+      const { error, data: updatedUser } = await supabase.auth.updateUser({
+        email: emailInput.value,
+        data: { name: nameInput.value }
+      });
+
+      if (error) {
+        alert("Erreur lors de la mise à jour : " + error.message);
+        return;
+      }
+
       alert('Informations mises à jour avec succès !');
 
-      // Désactiver l'édition
+      // Désactiver l\'édition
       nameInput.disabled = true;
       emailInput.disabled = true;
-      
-// Restaurer le bouton
-editBtn.innerHTML = '✏️ Modifier';
-editBtn.classList.remove('btn-primary');
-editBtn.classList.add('btn-secondary');
-editBtn.style.display = '';
-      
-      // Masquer les boutons d'action
+
+      // Restaurer le bouton
+      editBtn.innerHTML = '✏️ Modifier';
+      editBtn.classList.remove('btn-primary');
+      editBtn.classList.add('btn-secondary');
+      editBtn.style.display = '';
+
+      // Masquer les boutons d\'action
       formActions.style.display = 'none';
-      
+
       isEditingUser = false;
 
-      // Ici vous pourriez ajouter la logique pour envoyer les données au serveur
-      console.log('Nouvelles données utilisateur:', {
-        name: nameInput.value,
-        email: emailInput.value
-      });
+      // Mettre à jour les valeurs originales
+      originalUserData = {
+        name: updatedUser.user.user_metadata?.name || nameInput.value,
+        email: updatedUser.user.email
+      };
     }
 
 function isValidEmail(email) {
@@ -879,7 +889,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
   const email = document.getElementById('registerEmail').value.trim();
   const password = document.getElementById('registerPassword').value;
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: { data: { name } }
@@ -887,6 +897,11 @@ document.getElementById('registerForm').addEventListener('submit', async functio
   if (error) {
     alert("Erreur d'inscription : " + error.message);
     return;
+  }
+
+  // Mettre à jour les champs utilisateur si la session est immédiatement disponible
+  if (data && data.user) {
+    setUserInfoFields(data.user);
   }
 
   alert("Inscription réussie ! Vérifiez vos emails pour confirmer.");
@@ -911,10 +926,9 @@ document.addEventListener('DOMContentLoaded', function() {
   supabase.auth.getSession().then(({ data: { session } }) => {
     const logged = !!session;
 
-      if (logged) {
-        userId = session.user.id;
-        setUserInfoFields(session.user);
-        initData();
+    if (logged) {
+      userId = session.user.id;
+      initData();
       if (navTabs) navTabs.style.display = 'flex';
       if (content) content.style.display = '';
       if (loginPage) loginPage.style.display = 'none';
