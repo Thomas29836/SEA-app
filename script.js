@@ -92,6 +92,24 @@ function updateTotals() {
   if (progressBarEl) progressBarEl.style.width = percent + '%';
 }
 
+// Check if a pocket reached its goal and adjust global monthly budget
+function checkGoalCompletion(index) {
+  const pocket = pockets[index];
+  if (!pocket || !pocket.goal) return;
+  if (pocket.saved >= pocket.goal && pocket.monthly > 0) {
+    const removed = pocket.monthly;
+    // Update pocket monthly amount in Supabase
+    supabase.from('pockets').update({ monthly: 0 }).eq('id', pocket.id);
+    pocket.monthly = 0;
+    const totalRemaining = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+    alert(
+      `La poche "${pocket.name}" a atteint son objectif de ${formatNumber(pocket.goal)}€.` +
+      `\nMontant mensuel retiré : ${formatNumber(removed)}€.` +
+      `\nBudget mensuel restant : ${formatNumber(totalRemaining)}€.`
+    );
+  }
+}
+
     // Navigation entre les pages
 function showPage(evt, pageId) {
   // Masquer toutes les pages
@@ -527,6 +545,7 @@ async function addMoney(index, amount = null, description = null) {
   showPocketDetail(index);
   displayPockets();
   renderPockets();
+  checkGoalCompletion(index);
   updateTotals();
   renderHomeHistory();
 }
