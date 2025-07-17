@@ -1,4 +1,4 @@
- // Variable pour suivre l'état du SEA
+  // Variable pour suivre l'état du SEA
 let seaActive = false;
 let currentPocketIndex = -1;
 let userId = null;
@@ -1006,6 +1006,20 @@ document.addEventListener('DOMContentLoaded', function() {
   const content = document.querySelector('.content');
   const loginPage = document.getElementById('loginPage');
   const registerPage = document.getElementById('registerPage');
+  const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+  if (toggleRegisterPassword) {
+    toggleRegisterPassword.addEventListener('click', function () {
+      const pwdInput = document.getElementById('registerPassword');
+      if (!pwdInput) return;
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        this.textContent = '🙈';
+      } else {
+        pwdInput.type = 'password';
+        this.textContent = '👁️';
+      }
+    });
+  }
 
   supabase.auth.getSession().then(({ data: { session } }) => {
     const logged = !!session;
