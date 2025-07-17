@@ -71,7 +71,7 @@
           <p id="totalSavedAmount">0€</p>
           <p class="subtext" id="totalGoalsAmount">sur 0€ d'objectifs</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-card clickable" id="monthlyCard">
           <h5>Épargne Mensuelle</h5>
           <p id="totalMonthlyAmount">0€/mois</p>
           <p class="subtext">automatique chaque mois</p>
@@ -297,9 +297,35 @@
           </table>
         </div>
       <div id="historyPagination" class="pagination"></div>
-      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Détail de l'épargne mensuelle -->
+  <div id="monthlyDetail" class="page">
+    <button type="button" class="btn btn-secondary" id="monthlyBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
+    <div class="home-header">
+      <div class="home-title">
+        <h3 id="monthlyTitle">Épargne mensuelle</h3>
       </div>
     </div>
+    <div id="monthlySection" class="history-section">
+      <div id="monthlySummary" class="stats-grid"></div>      
+      <div class="table-container">
+        <table id="monthlyTable">
+          <thead>
+            <tr>
+              <th>Compte à prélever</th>
+              <th>Compte destinataire</th>
+              <th>Montant</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p id="monthlyTotal"></p>
+    </div>
+  </div>
 
   <div id="accountsModal" class="modal-overlay">
     <div class="modal accounts-modal">

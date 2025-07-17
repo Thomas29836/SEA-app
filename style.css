@@ -164,12 +164,35 @@ h3 {
   font-size: 1.5rem;
 }
 
+/* Monthly detail header overrides */
+#monthlyDetail .home-header {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+}
+#monthlyDetail .home-title {
+  flex: 1;
+  text-align: center;
+}
+#monthlyTitle {
+  font-size: 1.5rem;
+}
+#monthlyTotal {
+  margin-top: 1rem;
+  text-align: right;
+  font-weight: 600;
+}
+
     .stat-card {
       background: white;
       padding: 1rem;
       border-radius: 0.75rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       border: 1px solid #e2e8f0;
+    }
+
+    .stat-card.clickable {
+      cursor: pointer;
     }
 
     .stat-card h5 {

@@ -348,6 +348,59 @@ function showPocketDetail(index) {
   renderHistory(index, 1);
 }
 
+function showMonthlyDetail() {
+  const tbody = document.querySelector('#monthlyTable tbody');
+  const totalEl = document.getElementById('monthlyTotal');
+  const summaryEl = document.getElementById('monthlySummary');
+  if (!tbody || !totalEl || !summaryEl) return;
+
+  tbody.innerHTML = '';
+  summaryEl.innerHTML = '';  
+  let total = 0;
+
+    const groups = {};
+
+  pockets
+    .filter(p => p.monthly && !(p.goal && p.saved >= p.goal))
+    .forEach(p => {
+      const key = `${p.from || '-'}>${p.to || '-'}`;
+      if (!groups[key]) {
+        groups[key] = { from: p.from || '-', to: p.to || '-', amount: 0 };
+      }
+      groups[key].amount += p.monthly || 0;
+
+      const tr = document.createElement('tr');
+      const fromTd = document.createElement('td');
+      fromTd.textContent = p.from || '-';
+      const toTd = document.createElement('td');
+      toTd.textContent = p.to || '-';
+      const amountTd = document.createElement('td');
+      amountTd.textContent = `${formatNumber(p.monthly)}€`;
+      tr.appendChild(fromTd);
+      tr.appendChild(toTd);
+      tr.appendChild(amountTd);
+      tbody.appendChild(tr);
+
+      total += p.monthly || 0;
+    });
+
+  // Create summary cards
+  Object.values(groups).forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    const title = document.createElement('h5');
+    title.textContent = `${g.from} → ${g.to}`;
+    const amount = document.createElement('p');
+    amount.textContent = `${formatNumber(g.amount)}€/mois`;
+    card.appendChild(title);
+    card.appendChild(amount);
+    summaryEl.appendChild(card);
+  });
+
+  totalEl.textContent = `Total : ${formatNumber(total)}€/mois`;
+  showPage(null, 'monthlyDetail');
+}
+
 function renderPockets() {
   const container = document.getElementById('pocketsConfigContainer');
   if (!container) return;
@@ -1069,6 +1122,16 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshAccountsBtn.addEventListener('click', openBankAccountsModal);
   }
 
+  const monthlyCard = document.getElementById('monthlyCard');
+  if (monthlyCard) {
+    monthlyCard.addEventListener('click', showMonthlyDetail);
+  }
+
+  const monthlyBackBtn = document.getElementById('monthlyBackBtn');
+  if (monthlyBackBtn) {
+    monthlyBackBtn.addEventListener('click', () => showPage(null, 'accueil'));
+  }
+
   // Mettre à jour les comptes destinataires lorsqu'on change le compte prélevé
   const fromSelectEl = document.getElementById('pocketFrom');
   if (fromSelectEl) {
@@ -1578,3 +1641,4 @@ window.withdrawMoney = withdrawMoney;
 window.openMoneyForm = openMoneyForm;
 window.closeMoneyForm = closeMoneyForm;
 window.renderHomeHistory = renderHomeHistory;
+window.showMonthlyDetail = showMonthlyDetail;
