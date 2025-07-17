@@ -973,6 +973,11 @@ document.getElementById('registerForm').addEventListener('submit', async functio
   const email = document.getElementById('registerEmail').value.trim();
   const password = document.getElementById('registerPassword').value;
 
+  if (password.length < 6) {
+    alert('6 caractères minimum');
+    return;
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
