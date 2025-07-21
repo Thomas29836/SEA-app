@@ -445,6 +445,14 @@ h3 {
   flex: 1;
 }
 
+/* Transfers cards list */
+.transfer-list {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  padding-left: 1.25rem;
+}
+
     /* Table */
     .table-container {
       overflow-x: auto;
@@ -696,6 +704,11 @@ h3 {
   max-width: 500px;
 }
 
+/* Virements programmes */
+.transfers-modal {
+  max-width: 500px;
+}
+
 .accounts-summary {
   display: flex;
   justify-content: space-between;
@@ -912,6 +925,14 @@ h3 {
   border: 1px solid #d1d5db;
 }
 #refreshAccountsBtn:hover {
+  background: #f8fafc;
+}
+#viewTransfersBtn {
+  background: #fff;
+  color: #475569;
+  border: 1px solid #d1d5db;
+}
+#viewTransfersBtn:hover {
   background: #f8fafc;
 }
 

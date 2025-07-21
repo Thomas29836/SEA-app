@@ -71,7 +71,7 @@
           <p id="totalSavedAmount">0€</p>
           <p class="subtext" id="totalGoalsAmount">sur 0€ d'objectifs</p>
         </div>
-        <div class="stat-card clickable" id="monthlyCard">
+        <div class="stat-card" id="monthlyCard">
           <h5>Épargne Mensuelle</h5>
           <p id="totalMonthlyAmount">0€/mois</p>
           <p class="subtext">automatique chaque mois</p>
@@ -89,6 +89,7 @@
         <h4>Mes poches d'épargne</h4>
         <div class="header-actions">
           <button id="refreshAccountsBtn" class="btn btn-secondary">Comptes bancaires</button>
+          <button id="viewTransfersBtn" class="btn btn-secondary">Voir les Virements</button>
           <button id="homeAddPocketBtn" class="btn btn-primary"><span class="btn-plus">+</span> Ajouter une poche</button>
         </div>
       </div>
@@ -301,29 +302,12 @@
     </div>
   </div>
 
-  <!-- Détail de l'épargne mensuelle -->
-  <div id="monthlyDetail" class="page">
-    <button type="button" class="btn btn-secondary" id="monthlyBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
-    <div class="home-header">
-      <div class="home-title">
-        <h3 id="monthlyTitle">Épargne mensuelle</h3>
-      </div>
-    </div>
-    <div id="monthlySection" class="history-section">
-      <div id="monthlySummary" class="stats-grid"></div>      
-      <div class="table-container">
-        <table id="monthlyTable">
-          <thead>
-            <tr>
-              <th>Compte à prélever</th>
-              <th>Compte destinataire</th>
-              <th>Montant</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <p id="monthlyTotal"></p>
+  <!-- Virements programmes -->
+  <div id="transfersModal" class="modal-overlay">
+    <div class="modal transfers-modal">
+      <h3>Virements programmés</h3>
+      <div id="transfersContainer" class="cards-grid"></div>
+      <button type="button" class="btn btn-secondary" id="closeTransfersBtn" style="width:100%;margin-top:1rem;">Fermer</button>
     </div>
   </div>
 

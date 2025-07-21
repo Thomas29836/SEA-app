@@ -348,57 +348,51 @@ function showPocketDetail(index) {
   renderHistory(index, 1);
 }
 
-function showMonthlyDetail() {
-  const tbody = document.querySelector('#monthlyTable tbody');
-  const totalEl = document.getElementById('monthlyTotal');
-  const summaryEl = document.getElementById('monthlySummary');
-  if (!tbody || !totalEl || !summaryEl) return;
+function showTransfers() {
+  const container = document.getElementById('transfersContainer');
+  if (!container) return;
+  container.innerHTML = '';
 
-  tbody.innerHTML = '';
-  summaryEl.innerHTML = '';  
-  let total = 0;
-
-    const groups = {};
-
+  const groups = {};
   pockets
     .filter(p => p.monthly && !(p.goal && p.saved >= p.goal))
     .forEach(p => {
-      const key = `${p.from || '-'}>${p.to || '-'}`;
+      const from = p.from || '-';
+      const to = p.to || '-';
+      const key = `${from}>${to}`;
       if (!groups[key]) {
-        groups[key] = { from: p.from || '-', to: p.to || '-', amount: 0 };
+        groups[key] = { from, to, total: 0, pockets: [] };
       }
-      groups[key].amount += p.monthly || 0;
-
-      const tr = document.createElement('tr');
-      const fromTd = document.createElement('td');
-      fromTd.textContent = p.from || '-';
-      const toTd = document.createElement('td');
-      toTd.textContent = p.to || '-';
-      const amountTd = document.createElement('td');
-      amountTd.textContent = `${formatNumber(p.monthly)}€`;
-      tr.appendChild(fromTd);
-      tr.appendChild(toTd);
-      tr.appendChild(amountTd);
-      tbody.appendChild(tr);
-
-      total += p.monthly || 0;
+      groups[key].total += p.monthly || 0;
+      groups[key].pockets.push({ name: p.name, amount: p.monthly || 0 });
     });
 
-  // Create summary cards
   Object.values(groups).forEach(g => {
     const card = document.createElement('div');
     card.className = 'stat-card';
     const title = document.createElement('h5');
     title.textContent = `${g.from} → ${g.to}`;
-    const amount = document.createElement('p');
-    amount.textContent = `${formatNumber(g.amount)}€/mois`;
+    const total = document.createElement('p');
+    total.textContent = `${formatNumber(g.total)}€/mois`;
     card.appendChild(title);
-    card.appendChild(amount);
-    summaryEl.appendChild(card);
+    card.appendChild(total);
+    if (g.pockets.length) {
+      const list = document.createElement('ul');
+      list.className = 'transfer-list';
+      g.pockets.forEach(p => {
+        const li = document.createElement('li');
+        li.textContent = `${p.name} : ${formatNumber(p.amount)}€/mois`;
+        list.appendChild(li);
+      });
+      card.appendChild(list);
+    }
+    container.appendChild(card);
   });
-
-  totalEl.textContent = `Total : ${formatNumber(total)}€/mois`;
-  showPage(null, 'monthlyDetail');
+  const modal = document.getElementById('transfersModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
 }
 
 function renderPockets() {
@@ -1122,14 +1116,9 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshAccountsBtn.addEventListener('click', openBankAccountsModal);
   }
 
-  const monthlyCard = document.getElementById('monthlyCard');
-  if (monthlyCard) {
-    monthlyCard.addEventListener('click', showMonthlyDetail);
-  }
-
-  const monthlyBackBtn = document.getElementById('monthlyBackBtn');
-  if (monthlyBackBtn) {
-    monthlyBackBtn.addEventListener('click', () => showPage(null, 'accueil'));
+  const viewTransfersBtn = document.getElementById('viewTransfersBtn');
+  if (viewTransfersBtn) {
+    viewTransfersBtn.addEventListener('click', showTransfers);
   }
 
   // Mettre à jour les comptes destinataires lorsqu'on change le compte prélevé
@@ -1176,6 +1165,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (withdrawMoneyBtn) {
       withdrawMoneyBtn.addEventListener('click', () => openMoneyForm('withdraw'));
     }
+
+  const closeTransfersBtn = document.getElementById('closeTransfersBtn');
+  const transfersModal = document.getElementById('transfersModal');
+  if (closeTransfersBtn) {
+    closeTransfersBtn.addEventListener('click', closeTransfersModal);
+  }
+  if (transfersModal) {
+    transfersModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeTransfersModal();
+      }
+    });
+  }
   const modal = document.getElementById('pocketModal');
   if (modal) {
     modal.addEventListener('click', function(e) {
@@ -1516,6 +1518,13 @@ function closeBankAccountsModal() {
   closeAccountForm();
 }
 
+function closeTransfersModal() {
+  const modal = document.getElementById('transfersModal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
 function openAccountForm(index = -1) {
   const formSection = document.getElementById('accountFormSection');
   const listSection = document.getElementById('accountsListSection');
@@ -1640,5 +1649,6 @@ window.addMoney = addMoney;
 window.withdrawMoney = withdrawMoney;
 window.openMoneyForm = openMoneyForm;
 window.closeMoneyForm = closeMoneyForm;
+window.showTransfers = showTransfers;
+window.closeTransfersModal = closeTransfersModal;
 window.renderHomeHistory = renderHomeHistory;
-window.showMonthlyDetail = showMonthlyDetail;
