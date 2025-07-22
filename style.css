@@ -184,6 +184,7 @@ h3 {
 }
 
     .stat-card {
+      position: relative;
       background: white;
       padding: 1rem;
       border-radius: 0.75rem;
@@ -248,6 +249,13 @@ h3 {
 
     .icon-btn.delete {
       color: #dc2626;
+    }
+
+    .param-btn {
+      position: absolute;
+      top: 0.25rem;
+      right: 0.25rem;
+      font-size: 0.875rem;
     }
 
     /* Make bank accounts card span full width */
@@ -704,6 +712,145 @@ h3 {
   max-width: 500px;
 }
 
+/* Gestion de la répartition */
+.distribution-modal {
+  max-width: 500px;
+}
+
+.budget-section {
+  margin-bottom: 1rem;
+}
+
+.budget-section h4 {
+  margin-bottom: 0.25rem;
+}
+
+.budget-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#monthlyBudgetInput {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.distribution-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.distribution-summary {
+  margin-bottom: 1rem;
+}
+
+.distribution-summary h5 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.distribution-summary .amounts-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.distribution-summary .amount-col {
+  text-align: center;
+}
+
+.distribution-summary .label {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.distribution-summary .value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.distribution-summary .progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.distribution-summary .progress-text {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.distribution-summary .progress-percent {
+  font-size: 0.8rem;
+  color: #000;
+}
+
+.distribution-warning {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  color: #dc2626;  
+}
+
+.positive {
+  color: #16a34a;
+}
+
+.distribution-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.distribution-card .dist-left {
+  flex: 1;
+}
+
+.distribution-card .dist-name {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.distribution-card .dist-total {
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 0.5rem;
+}
+
+.distribution-card .dist-months {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.distribution-card .dist-right {
+  width: 140px;
+  text-align: right;
+}
+
+.distribution-card .dist-monthly {
+  font-weight: 700;
+}
+
+.distribution-card .dist-percent {
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 0.25rem;
+}
+
+.distribution-slider {
+  width: 100%;
+}
+
 /* Virements programmes */
 .transfers-modal {
   max-width: 500px;
@@ -933,6 +1080,14 @@ h3 {
   border: 1px solid #d1d5db;
 }
 #viewTransfersBtn:hover {
+  background: #f8fafc;
+}
+#manageDistributionBtn {
+  background: #fff;
+  color: #475569;
+  border: 1px solid #d1d5db;
+}
+#manageDistributionBtn:hover {
   background: #f8fafc;
 }
 

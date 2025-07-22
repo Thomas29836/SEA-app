@@ -4,6 +4,8 @@ let currentPocketIndex = -1;
 let userId = null;
 let pockets = [];
 let accounts = [];
+// Budget mensuel d'épargne par défaut
+let monthlyBudget = 500;
 const accountColors = [
   '#f87171',
   '#fb923c',
@@ -40,11 +42,18 @@ function monthsUntil(dateStr) {
   return months < 0 ? 0 : months;
 }
 
-// Format numbers with comma as thousands separator
+// Format numbers with two decimals and French separators
 function formatNumber(value) {
   const num = parseFloat(value);
-  if (isNaN(num)) return '0';
-  return num.toLocaleString('en-US');
+  if (isNaN(num)) return '0,00';
+  return num.toLocaleString('fr-FR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function formatPercent(value) {
+  return Math.round(value) + ' %';
 }
 
 async function loadPockets() {
@@ -393,6 +402,184 @@ function showTransfers() {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
+}
+
+function showDistribution() {
+  const modal = document.getElementById('distributionModal');
+  if (!modal) return;
+  const total = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+  if (total > 0) {
+    monthlyBudget = total;
+  }
+  const input = document.getElementById('monthlyBudgetInput');
+  if (input) input.value = monthlyBudget.toFixed(2);  
+    renderDistribution();
+  updateDistributionSummary();    
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDistributionModal() {
+  const modal = document.getElementById('distributionModal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function autoDistribute() {
+  if (pockets.length === 0) return;
+  const amountPerPocket = monthlyBudget / pockets.length;
+  pockets.forEach(p => {
+    p.monthly = amountPerPocket;
+    supabase.from('pockets').update({ monthly: amountPerPocket }).eq('id', p.id);
+  });
+  renderDistribution();
+  updateDistributionSummary();
+  updateTotals();
+}
+
+function resetDistribution() {
+  if (!confirm('Remettre la répartition à zéro ?')) return;
+  pockets.forEach(p => {
+    if (p.monthly !== 0) {
+      p.monthly = 0;
+      supabase.from('pockets').update({ monthly: 0 }).eq('id', p.id);
+    }
+  });
+  renderDistribution();
+  updateDistributionSummary();
+  updateTotals();
+}
+
+function monthsToGoal(pocket, monthlyAmount) {
+  if (!pocket.goal) return 0;
+  const remaining = Math.max(0, (pocket.goal || 0) - (pocket.saved || 0));
+  if (!monthlyAmount) return 0;
+  return Math.ceil(remaining / monthlyAmount);
+}
+
+function updateDistributionSummary() {
+  const total = monthlyBudget;
+  const allocated = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+  const available = total - allocated;
+  const percent = total > 0 ? Math.min(100, (allocated / total) * 100) : 0;
+
+  const totalEl = document.getElementById('distributionTotal');
+  const allocatedEl = document.getElementById('distributionAllocated');
+  const availableEl = document.getElementById('distributionAvailable');
+  const percentEl = document.getElementById('distributionPercent');
+  const barEl = document.getElementById('distributionProgressBar');
+  const overEl = document.getElementById('distributionOverText');
+
+  if (totalEl) totalEl.textContent = `${formatNumber(total)} €`;
+  if (allocatedEl) allocatedEl.textContent = `${formatNumber(allocated)} €`;
+  if (availableEl) {
+    availableEl.textContent = `${formatNumber(available)} €`;
+    availableEl.classList.remove('warning', 'positive');
+    if (available < 0) {
+      availableEl.classList.add('warning');
+    } else {
+      availableEl.classList.add('positive');
+    }
+  }
+  if (percentEl) percentEl.textContent = Math.round(percent) + ' %';
+  if (barEl) barEl.style.width = percent + '%';
+  if (overEl) {
+    overEl.style.display = available < 0 ? 'block' : 'none';
+  }
+}
+
+function renderDistribution() {
+  const container = document.getElementById('distributionPocketsContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  const totalMonthly = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+
+  pockets.forEach((pocket) => {
+    const percent = monthlyBudget ? ((pocket.monthly || 0) / monthlyBudget) * 100 : 0;
+
+    const card = document.createElement('div');
+    card.className = 'card distribution-card';
+
+    const left = document.createElement('div');
+    left.className = 'dist-left';
+
+  const nameRow = document.createElement('div');
+  nameRow.className = 'dist-name';
+  if (pocket.icon) {
+    const icon = document.createElement('span');
+    icon.textContent = pocket.icon;
+    nameRow.appendChild(icon);
+  }
+  const name = document.createElement('span');
+  name.textContent = pocket.name;
+  nameRow.appendChild(name);
+
+    const totalText = document.createElement('p');
+    totalText.className = 'dist-total';
+    totalText.textContent = `${formatNumber(pocket.saved)} € / ${formatNumber(pocket.goal)} €`;
+
+    const progress = document.createElement('div');
+    progress.className = 'progress';
+    const bar = document.createElement('div');
+    bar.className = 'progress-bar';
+    const progPercent = pocket.goal ? Math.min(100, (pocket.saved / pocket.goal) * 100) : 0;
+    bar.style.width = progPercent + '%';
+    progress.appendChild(bar);
+
+    const monthsEl = document.createElement('p');
+    monthsEl.className = 'dist-months';
+    const months = monthsToGoal(pocket, pocket.monthly);
+    monthsEl.textContent = months ? `Objectif atteint dans ${months} mois` : 'Objectif atteint';
+
+    left.appendChild(nameRow);
+    left.appendChild(totalText);
+    left.appendChild(progress);
+    left.appendChild(monthsEl);
+
+    const right = document.createElement('div');
+    right.className = 'dist-right';
+
+    const monthlyEl = document.createElement('p');
+    monthlyEl.className = 'dist-monthly';
+    monthlyEl.innerHTML = `<strong>${formatNumber(pocket.monthly)}</strong> € par mois`;
+
+    const percentEl = document.createElement('p');
+    percentEl.className = 'dist-percent';
+    percentEl.textContent = formatPercent(percent);
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = '0';
+    slider.max = '100';
+    slider.step = '1';
+    slider.value = Math.round(percent);
+    slider.className = 'distribution-slider';
+    slider.addEventListener('input', function () {
+      const newPercent = parseFloat(this.value);
+      percentEl.textContent = formatPercent(newPercent);
+      const newMonthly = (monthlyBudget * newPercent) / 100;
+      monthlyEl.innerHTML = `<strong>${formatNumber(newMonthly)}</strong> € par mois`;
+      const m = monthsToGoal(pocket, newMonthly);
+      monthsEl.textContent = m ? `Objectif atteint dans ${m} mois` : 'Objectif atteint';
+      updateDistributionSummary();      
+    });
+    slider.addEventListener('change', function () {
+      const newPercent = parseFloat(this.value);
+      const newMonthly = (monthlyBudget * newPercent) / 100;
+      pocket.monthly = newMonthly;
+      updateTotals();
+      updateDistributionSummary();      
+    });
+
+    right.appendChild(monthlyEl);
+    right.appendChild(percentEl);
+    right.appendChild(slider);
+
+    card.appendChild(left);
+    card.appendChild(right);
+    container.appendChild(card);
+  });
 }
 
 function renderPockets() {
@@ -1121,6 +1308,11 @@ document.addEventListener('DOMContentLoaded', function() {
     viewTransfersBtn.addEventListener('click', showTransfers);
   }
 
+  const manageDistributionBtn = document.getElementById('manageDistributionBtn');
+  if (manageDistributionBtn) {
+    manageDistributionBtn.addEventListener('click', showDistribution);
+  }
+
   // Mettre à jour les comptes destinataires lorsqu'on change le compte prélevé
   const fromSelectEl = document.getElementById('pocketFrom');
   if (fromSelectEl) {
@@ -1150,11 +1342,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (backDetailBtn) {
     backDetailBtn.addEventListener('click', () => showPage(null, 'accueil'));
   }
-    if (settingsBackBtn) {
-      settingsBackBtn.addEventListener('click', () => {
-        showPage(null, 'accueil');
-        const tabs = document.querySelectorAll('.nav-tab');
-        tabs.forEach(tab => tab.classList.remove('active'));
+  if (settingsBackBtn) {
+    settingsBackBtn.addEventListener('click', () => {
+      showPage(null, 'accueil');
+      const tabs = document.querySelectorAll('.nav-tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
         tabs[0]?.classList.add('active');
       });
     }
@@ -1168,6 +1360,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const closeTransfersBtn = document.getElementById('closeTransfersBtn');
   const transfersModal = document.getElementById('transfersModal');
+  const closeDistributionBtn = document.getElementById('closeDistributionBtn');
+  const distributionModal = document.getElementById('distributionModal');
+    const autoDistributionBtn = document.getElementById('autoDistributionBtn');
+  const resetDistributionBtn = document.getElementById('resetDistributionBtn');
+  const monthlyBudgetInput = document.getElementById('monthlyBudgetInput');  
   if (closeTransfersBtn) {
     closeTransfersBtn.addEventListener('click', closeTransfersModal);
   }
@@ -1175,6 +1372,38 @@ document.addEventListener('DOMContentLoaded', function() {
     transfersModal.addEventListener('click', function(e) {
       if (e.target === this) {
         closeTransfersModal();
+      }
+    });
+  }
+  if (closeDistributionBtn) {
+    closeDistributionBtn.addEventListener('click', closeDistributionModal);
+  }
+    if (autoDistributionBtn) {
+    autoDistributionBtn.addEventListener('click', autoDistribute);
+  }
+  if (resetDistributionBtn) {
+    resetDistributionBtn.addEventListener('click', resetDistribution);
+  }
+  if (monthlyBudgetInput) {
+    monthlyBudgetInput.addEventListener('change', function() {
+      const newBudget = parseFloat(this.value) || 0;
+      const currentTotal = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+      if (currentTotal > 0) {
+        const ratio = newBudget / currentTotal;
+        pockets.forEach(p => {
+          p.monthly = (p.monthly || 0) * ratio;
+        });
+      }
+      monthlyBudget = newBudget;
+      updateTotals();
+      renderDistribution();
+      updateDistributionSummary();      
+    });
+  }  
+  if (distributionModal) {
+    distributionModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeDistributionModal();
       }
     });
   }
@@ -1650,5 +1879,9 @@ window.withdrawMoney = withdrawMoney;
 window.openMoneyForm = openMoneyForm;
 window.closeMoneyForm = closeMoneyForm;
 window.showTransfers = showTransfers;
+window.showDistribution = showDistribution;
+window.closeDistributionModal = closeDistributionModal;
 window.closeTransfersModal = closeTransfersModal;
+window.autoDistribute = autoDistribute;
+window.resetDistribution = resetDistribution;
 window.renderHomeHistory = renderHomeHistory;

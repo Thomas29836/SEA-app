@@ -88,9 +88,10 @@
       <div class="section-header">
         <h4>Mes poches d'épargne</h4>
         <div class="header-actions">
-          <button id="refreshAccountsBtn" class="btn btn-secondary">Comptes bancaires</button>
+          <button id="refreshAccountsBtn" class="btn btn-secondary">Comptes Bancaires</button>
           <button id="viewTransfersBtn" class="btn btn-secondary">Voir les Virements</button>
-          <button id="homeAddPocketBtn" class="btn btn-primary"><span class="btn-plus">+</span> Ajouter une poche</button>
+          <button id="manageDistributionBtn" class="btn btn-secondary">Gérer la Répartition</button>
+          <button id="homeAddPocketBtn" class="btn btn-primary"><span class="btn-plus">+</span> Nouvelle Poche</button>
         </div>
       </div>
       <div id="pocketsContainer" class="cards-grid"></div>
@@ -301,6 +302,57 @@
     </div>
     </div>
   </div>
+
+  <!-- Gestion de la répartition -->
+  <div id="distributionModal" class="modal-overlay">
+    <div class="modal distribution-modal">
+      <h3>Gestion de la Répartition</h3>
+      <div class="budget-section">
+        <h4>Budget mensuel d'épargne</h4>
+        <p class="subtext">Montant total que vous souhaitez épargner chaque mois</p>
+        <div class="budget-input-row">
+          <input type="number" id="monthlyBudgetInput" min="0" value="500" />
+          <span>€/mois</span>
+        </div>
+      </div>
+      <div id="distributionSummary" class="stat-card distribution-summary">
+        <h5>Épargne Mensuel</h5>
+        <div class="amounts-row">
+          <div class="amount-col">
+            <p class="label">Épargne totale</p>
+            <p id="distributionTotal" class="value">0,00 €</p>
+          </div>
+          <div class="amount-col">
+            <p class="label">Alloué</p>
+            <p id="distributionAllocated" class="value">0,00 €</p>
+          </div>
+          <div class="amount-col">
+            <p class="label">Disponible</p>
+            <p id="distributionAvailable" class="value">0,00 €</p>
+          </div>
+        </div>
+        <div class="progress-label">
+          <span class="progress-text">Répartition</span>          
+          <span id="distributionPercent" class="progress-percent">0 %</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" id="distributionProgressBar"></div>
+        </div>
+        <p id="distributionOverText" class="distribution-warning" style="display:none;">
+          La répartition dépasse 100%
+        </p>        
+      </div>      
+        <div class="distribution-actions">
+          <button type="button" class="btn btn-secondary" id="autoDistributionBtn">Répartition automatique</button>
+          <button type="button" class="btn btn-secondary" id="resetDistributionBtn">Remettre à zéro</button>
+        </div>
+        <div class="section-header">
+          <h4>Répartition par Poche</h4>
+        </div>
+        <div id="distributionPocketsContainer" class="cards-grid"></div>        
+        <button type="button" class="btn btn-secondary" id="closeDistributionBtn" style="width:100%;margin-top:1rem;">Fermer</button>
+      </div>
+    </div>
 
   <!-- Virements programmes -->
   <div id="transfersModal" class="modal-overlay">
