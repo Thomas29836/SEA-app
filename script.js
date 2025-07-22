@@ -257,9 +257,6 @@ function displayPockets() {
         title.className = 'pocket-title';
         title.textContent = pocket.name;
 
-        const monthly = document.createElement('p');
-        monthly.textContent = `${formatNumber(pocket.monthly)}€/mois`;
-
         const progressWrapper = document.createElement('div');
         progressWrapper.className = 'progress-wrapper';
         const progress = document.createElement('div');
@@ -304,7 +301,6 @@ function displayPockets() {
         deadline.textContent = `Échéance : ${formatDateDisplay(pocket.deadline)}`;
 
         card.appendChild(title);
-        card.appendChild(monthly);
         card.appendChild(progressWrapper);
         card.appendChild(amountsRow);
         card.appendChild(deadline);
@@ -322,7 +318,6 @@ function showPocketDetail(index) {
   if (!pocket) return;
   currentPocketIndex = index;
   document.getElementById('detailName').textContent = pocket.name;
-  document.getElementById('detailMonthly').textContent = `${formatNumber(pocket.monthly)}€/mois`;
   document.getElementById('detailSaved').textContent = formatNumber(pocket.saved) + '€';
   document.getElementById('detailGoal').textContent = formatNumber(pocket.goal) + '€';
   const remaining = Math.max(0, (pocket.goal || 0) - (pocket.saved || 0));
@@ -804,13 +799,16 @@ async function addMoney(index, amount = null, description = null, date = null) {
     date: txDate,
     description
   });
-  const { error, data: updated } = await supabase
+  // Update only the current balance and history.
+  // The monthly allocation must never be altered here.
+  const { error } = await supabase
     .from('pockets')
     .update({ saved: newSaved, history })
-    .eq('id', pocket.id)
-    .select()
-    .single();
-  if (!error && updated) pockets[index] = updated;
+    .eq('id', pocket.id);
+  if (!error) {
+    pockets[index].saved = newSaved;
+    pockets[index].history = history;
+  }
   showPocketDetail(index);
   displayPockets();
   renderPockets();
@@ -838,13 +836,15 @@ async function withdrawMoney(index, amount = null, description = null, date = nu
     date: txDate,
     description
   });
-  const { error, data: updated } = await supabase
+  // Only the current balance is changed. The monthly allocation stays fixed.
+  const { error } = await supabase
     .from('pockets')
     .update({ saved: newSaved, history })
-    .eq('id', pocket.id)
-    .select()
-    .single();
-  if (!error && updated) pockets[index] = updated;
+    .eq('id', pocket.id);
+  if (!error) {
+    pockets[index].saved = newSaved;
+    pockets[index].history = history;
+  }
   showPocketDetail(index);
   displayPockets();
   renderPockets();
