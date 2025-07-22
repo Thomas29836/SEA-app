@@ -174,9 +174,6 @@
 
         <div class="settings-section">
           <h3>Actions</h3>
-          <button class="btn btn-secondary" onclick="resetSEA()" style="margin-bottom: 0.5rem; width: 100%;">
-            🔄 Réinitialiser le SEA
-          </button>
           <button class="btn btn-primary" onclick="logout()" style="width: 100%;">
             🚪 Se déconnecter
           </button>
@@ -210,13 +207,6 @@
         <div class="form-group">
           <label for="pocketDeadline">Échéance</label>
           <input type="date" id="pocketDeadline">
-        </div>
-        <div class="form-group">
-          <label for="pocketMonthly">Montant mensuel (€)</label>
-          <div class="monthly-group">
-            <input type="number" id="pocketMonthly" min="0">
-            <button type="button" class="btn btn-secondary" onclick="calculateMonthly()">Calculer</button>
-          </div>
         </div>
         <div class="form-group">
           <label for="pocketFrom">Compte à prélever</label>
@@ -306,6 +296,7 @@
   <!-- Gestion de la répartition -->
   <div id="distributionModal" class="modal-overlay">
     <div class="modal distribution-modal">
+      <button id="editDistributionBtn" class="btn btn-secondary btn-sm distribution-edit-btn" title="Modifier la répartition">✏️</button>
       <h3>Gestion de la Répartition</h3>
       <div class="budget-section">
         <h4>Budget mensuel d'épargne</h4>

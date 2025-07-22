@@ -74,6 +74,21 @@ async function loadAccounts() {
   accounts = error ? [] : data || [];
 }
 
+async function loadMonthlyBudget() {
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) {
+    monthlyBudget = 500;
+    return;
+  }
+  const metaBudget = parseFloat(data.user.user_metadata?.monthly_budget);
+  if (!isNaN(metaBudget)) {
+    monthlyBudget = metaBudget;
+  } else {
+    monthlyBudget = 500;
+    await supabase.auth.updateUser({ data: { monthly_budget: monthlyBudget } });
+  }
+}
+
 async function initData() {
   await Promise.all([loadPockets(), loadAccounts()]);
   updateTotals();
@@ -131,16 +146,22 @@ async function promptMonthlyUpdate(index) {
   const newMonthly = Math.ceil(remaining / months);
   if (newMonthly === pocket.monthly) return;
   if (confirm(`Mettre à jour le montant mensuel à ${formatNumber(newMonthly)}€ ?`)) {
-    const { error } = await supabase
+    const { error, data: updated } = await supabase
       .from('pockets')
       .update({ monthly: newMonthly })
-      .eq('id', pocket.id);
+      .eq('id', pocket.id)
+      .select()
+      .single();
     if (!error) {
-      pocket.monthly = newMonthly;
+      if (updated) pockets[index] = updated; else pocket.monthly = newMonthly;
       showPocketDetail(index);
       displayPockets();
       renderPockets();
       updateTotals();
+      await showDistribution();
+      setTimeout(() => {
+        document.getElementById(`distributionCard-${index}`)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     } else {
       alert("Erreur lors de la mise à jour du montant mensuel");
     }
@@ -404,15 +425,12 @@ function showTransfers() {
   }
 }
 
-function showDistribution() {
+async function showDistribution() {
   const modal = document.getElementById('distributionModal');
   if (!modal) return;
-  const total = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
-  if (total > 0) {
-    monthlyBudget = total;
-  }
+  await loadMonthlyBudget();
   const input = document.getElementById('monthlyBudgetInput');
-  if (input) input.value = monthlyBudget.toFixed(2);  
+  if (input) input.value = monthlyBudget.toFixed(2); 
     renderDistribution();
   updateDistributionSummary();    
   modal.classList.add('active');
@@ -422,6 +440,11 @@ function showDistribution() {
 function closeDistributionModal() {
   const modal = document.getElementById('distributionModal');
   if (!modal) return;
+  const allocated = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+  if (Math.abs(allocated - monthlyBudget) > 0.01) {
+    alert('La répartition doit être exactement de 100% avant de fermer cette fenêtre.');
+    return;
+  }
   modal.classList.remove('active');
   document.body.style.overflow = '';
 }
@@ -436,6 +459,10 @@ function autoDistribute() {
   renderDistribution();
   updateDistributionSummary();
   updateTotals();
+  displayPockets();
+  if (document.getElementById('pocketDetail')?.classList.contains('active')) {
+    showPocketDetail(currentPocketIndex);
+  }
 }
 
 function resetDistribution() {
@@ -449,6 +476,10 @@ function resetDistribution() {
   renderDistribution();
   updateDistributionSummary();
   updateTotals();
+  displayPockets();
+  if (document.getElementById('pocketDetail')?.classList.contains('active')) {
+    showPocketDetail(currentPocketIndex);
+  }
 }
 
 function monthsToGoal(pocket, monthlyAmount) {
@@ -470,6 +501,7 @@ function updateDistributionSummary() {
   const percentEl = document.getElementById('distributionPercent');
   const barEl = document.getElementById('distributionProgressBar');
   const overEl = document.getElementById('distributionOverText');
+  const editBtn = document.getElementById('editDistributionBtn');
 
   if (totalEl) totalEl.textContent = `${formatNumber(total)} €`;
   if (allocatedEl) allocatedEl.textContent = `${formatNumber(allocated)} €`;
@@ -487,6 +519,9 @@ function updateDistributionSummary() {
   if (overEl) {
     overEl.style.display = available < 0 ? 'block' : 'none';
   }
+  if (editBtn) {
+    editBtn.style.display = Math.abs(available) > 0.01 ? 'block' : 'none';
+  }
 }
 
 function renderDistribution() {
@@ -495,11 +530,12 @@ function renderDistribution() {
   container.innerHTML = '';
   const totalMonthly = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
 
-  pockets.forEach((pocket) => {
+  pockets.forEach((pocket, idx) => {
     const percent = monthlyBudget ? ((pocket.monthly || 0) / monthlyBudget) * 100 : 0;
 
     const card = document.createElement('div');
     card.className = 'card distribution-card';
+    card.id = `distributionCard-${idx}`;
 
     const left = document.createElement('div');
     left.className = 'dist-left';
@@ -562,14 +598,25 @@ function renderDistribution() {
       monthlyEl.innerHTML = `<strong>${formatNumber(newMonthly)}</strong> € par mois`;
       const m = monthsToGoal(pocket, newMonthly);
       monthsEl.textContent = m ? `Objectif atteint dans ${m} mois` : 'Objectif atteint';
-      updateDistributionSummary();      
+      pocket.monthly = newMonthly;
+      updateDistributionSummary();
+      displayPockets();
+      updateTotals();
+      if (document.getElementById('pocketDetail')?.classList.contains('active') && pockets[currentPocketIndex] === pocket) {
+        showPocketDetail(currentPocketIndex);
+      }
     });
     slider.addEventListener('change', function () {
       const newPercent = parseFloat(this.value);
       const newMonthly = (monthlyBudget * newPercent) / 100;
       pocket.monthly = newMonthly;
+      supabase.from('pockets').update({ monthly: newMonthly }).eq('id', pocket.id);
       updateTotals();
-      updateDistributionSummary();      
+      updateDistributionSummary();
+      displayPockets();
+      if (document.getElementById('pocketDetail')?.classList.contains('active') && pockets[currentPocketIndex] === pocket) {
+        showPocketDetail(currentPocketIndex);
+      }      
     });
 
     right.appendChild(monthlyEl);
@@ -685,7 +732,6 @@ function openPocketForm(index = -1) {
     if (p) {
       document.getElementById('pocketName').value = p.name || '';
       document.getElementById('pocketGoal').value = p.goal || '';
-      document.getElementById('pocketMonthly').value = p.monthly || '';
       document.getElementById('pocketFrom').value = p.from || '';
       document.getElementById('pocketTo').value = p.to || '';
       document.getElementById('pocketDeadline').value = p.deadline || '';
@@ -710,7 +756,6 @@ async function savePocket(e) {
   const data = {
     name: document.getElementById('pocketName').value.trim(),
     goal: parseFloat(document.getElementById('pocketGoal').value) || 0,
-    monthly: parseFloat(document.getElementById('pocketMonthly').value) || 0,
     from: document.getElementById('pocketFrom').value,
     to: document.getElementById('pocketTo').value,
     deadline: document.getElementById('pocketDeadline').value,
@@ -908,32 +953,6 @@ function submitMoneyForm(e) {
     closeMoneyForm();
   }
 
-// Calcul automatique du montant mensuel
-function calculateMonthly() {
-  const goal = parseFloat(document.getElementById('pocketGoal').value) || 0;
-  const deadlineStr = document.getElementById('pocketDeadline').value;
-
-  if (!goal || !deadlineStr) {
-    alert("Veuillez d'abord saisir un objectif et une échéance");
-    return;
-  }
-
-  const deadline = new Date(deadlineStr);
-  const today = new Date();
-
-  let months =
-    (deadline.getFullYear() - today.getFullYear()) * 12 +
-    (deadline.getMonth() - today.getMonth()) +
-    1;
-
-  if (months <= 0) {
-    months = 1;
-  }
-
-  const monthly = Math.ceil(goal / months);
-  document.getElementById('pocketMonthly').value = monthly;
-}
-
 // Remplir automatiquement le nom de la poche
 function setPocketName(name) {
   document.getElementById('pocketName').value = name;
@@ -948,58 +967,6 @@ function setPocketName(name) {
           }
         });
       }
-
-    // Fonctions pour les paramètres
-async function resetSEA() {
-  if (confirm('Êtes-vous sûr de vouloir réinitialiser votre SEA ?')) {
-    // Supprimer les données de l'utilisateur dans Supabase
-    const { error: pocketError } = await supabase.from('pockets').delete().eq('user_id', userId);
-    const { error: accountError } = await supabase.from('accounts').delete().eq('user_id', userId);
-    if (pocketError || accountError) {
-      alert('Erreur lors de la réinitialisation du SEA');
-      console.error('Supabase error', pocketError || accountError);
-      return;
-    }
-    pockets = [];
-    accounts = [];
-
-    // Remise à zéro des paramètres du SEA
-    seaActive = false;
-
-    const montant = document.getElementById('montant');
-    const jour = document.getElementById('jour');
-    const depart = document.getElementById('compteDepart');
-    const destination = document.getElementById('destination');
-
-    if (montant) montant.value = 200;
-    if (jour) jour.selectedIndex = 0;
-    if (depart) depart.selectedIndex = 0;
-    if (destination) destination.selectedIndex = 0;
-
-    updateSeaStatus();
-
-    // Rafraîchir l'affichage
-    if (typeof renderPockets === 'function') {
-      renderPockets();
-    }
-    if (typeof renderHistory === 'function') {
-      renderHistory();
-    }
-    if (typeof displayPockets === 'function') {
-      displayPockets();
-    }
-    populateHistoryPocketFilter();
-    renderHomeHistory();
-
-    alert('SEA réinitialisé !');
-
-      // Retourner à la page d'accueil
-      showPage(null, 'accueil');
-      const tabs = document.querySelectorAll('.nav-tab');
-      tabs.forEach(tab => tab.classList.remove('active'));
-      tabs[0]?.classList.add('active');
-  }
-}
 
 // Déconnexion de l'utilisateur
 async function logout() {
@@ -1174,6 +1141,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   const { data: { user } } = await supabase.auth.getUser();
   userId = user.id;
   setUserInfoFields(user);
+  await loadMonthlyBudget();
   await initData();
 
   document.getElementById('loginPage').style.display = 'none';
@@ -1260,13 +1228,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  supabase.auth.getSession().then(({ data: { session } }) => {
+  supabase.auth.getSession().then(async ({ data: { session } }) => {
     const logged = !!session;
 
     if (logged) {
       userId = session.user.id;
       setUserInfoFields(session.user);
-      initData();
+      await loadMonthlyBudget();
+      await initData();
       if (navTabs) navTabs.style.display = 'flex';
       if (content) content.style.display = '';
       if (loginPage) loginPage.style.display = 'none';
@@ -1361,6 +1330,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const closeTransfersBtn = document.getElementById('closeTransfersBtn');
   const transfersModal = document.getElementById('transfersModal');
   const closeDistributionBtn = document.getElementById('closeDistributionBtn');
+  const editDistributionBtn = document.getElementById('editDistributionBtn');
   const distributionModal = document.getElementById('distributionModal');
     const autoDistributionBtn = document.getElementById('autoDistributionBtn');
   const resetDistributionBtn = document.getElementById('resetDistributionBtn');
@@ -1378,6 +1348,13 @@ document.addEventListener('DOMContentLoaded', function() {
   if (closeDistributionBtn) {
     closeDistributionBtn.addEventListener('click', closeDistributionModal);
   }
+  if (editDistributionBtn) {
+    editDistributionBtn.addEventListener('click', function() {
+      document.getElementById('distributionPocketsContainer')?.scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  }
     if (autoDistributionBtn) {
     autoDistributionBtn.addEventListener('click', autoDistribute);
   }
@@ -1385,7 +1362,7 @@ document.addEventListener('DOMContentLoaded', function() {
     resetDistributionBtn.addEventListener('click', resetDistribution);
   }
   if (monthlyBudgetInput) {
-    monthlyBudgetInput.addEventListener('change', function() {
+    monthlyBudgetInput.addEventListener('change', async function() {
       const newBudget = parseFloat(this.value) || 0;
       const currentTotal = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
       if (currentTotal > 0) {
@@ -1395,11 +1372,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
       monthlyBudget = newBudget;
+      await supabase.auth.updateUser({ data: { monthly_budget: newBudget } });      
       updateTotals();
       renderDistribution();
-      updateDistributionSummary();      
+      updateDistributionSummary();
+      displayPockets();
+      if (document.getElementById('pocketDetail')?.classList.contains('active')) {
+        showPocketDetail(currentPocketIndex);
+      }
     });
-  }  
+  } 
   if (distributionModal) {
     distributionModal.addEventListener('click', function(e) {
       if (e.target === this) {
@@ -1856,7 +1838,6 @@ window.showDeactivateModal = showDeactivateModal;
 window.closeDeactivateModal = closeDeactivateModal;
 window.confirmDeactivateSEA = confirmDeactivateSEA;
 window.reactivateSEA = reactivateSEA;
-window.resetSEA = resetSEA;
 window.logout = logout;
 window.toggleUserEdit = toggleUserEdit;
 window.cancelUserEdit = cancelUserEdit;
@@ -1865,7 +1846,6 @@ window.openPocketForm = openPocketForm;
 window.closePocketForm = closePocketForm;
 window.savePocket = savePocket;
 window.deletePocket = deletePocket;
-window.calculateMonthly = calculateMonthly;
 window.setPocketName = setPocketName;
 window.showPocketDetail = showPocketDetail;
 window.openBankAccountsModal = openBankAccountsModal;

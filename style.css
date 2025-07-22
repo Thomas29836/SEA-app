@@ -443,16 +443,6 @@ h3 {
   flex: 1;
 }
 
-/* Monthly amount input and calculate button */
-.monthly-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.monthly-group input {
-  flex: 1;
-}
-
 /* Transfers cards list */
 .transfer-list {
   margin-top: 0.5rem;
@@ -715,6 +705,13 @@ h3 {
 /* Gestion de la répartition */
 .distribution-modal {
   max-width: 500px;
+  position: relative;
+}
+
+.distribution-edit-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
 .budget-section {
@@ -995,10 +992,6 @@ h3 {
 
   .btn {
     width: 100%;
-  }
-
-  .monthly-group {
-    flex-direction: column-reverse;
   }
 
   /* Responsive history tables */
