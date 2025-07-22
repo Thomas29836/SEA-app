@@ -123,48 +123,9 @@ function checkGoalCompletion(index) {
   const pocket = pockets[index];
   if (!pocket || !pocket.goal) return;
   if (pocket.saved >= pocket.goal && pocket.monthly > 0) {
-    const removed = pocket.monthly;
-    // Update pocket monthly amount in Supabase
-    supabase.from('pockets').update({ monthly: 0 }).eq('id', pocket.id);
-    pocket.monthly = 0;
-    const totalRemaining = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
     alert(
-      `La poche "${pocket.name}" a atteint son objectif de ${formatNumber(pocket.goal)}€.` +
-      `\nMontant mensuel retiré : ${formatNumber(removed)}€.` +
-      `\nBudget mensuel restant : ${formatNumber(totalRemaining)}€.`
+      `La poche "${pocket.name}" a atteint son objectif de ${formatNumber(pocket.goal)}€.`
     );
-  }
-}
-
-// Offer to update monthly amount after a change in savings
-async function promptMonthlyUpdate(index) {
-  const pocket = pockets[index];
-  if (!pocket || !pocket.goal || !pocket.deadline) return;
-  const remaining = Math.max(0, (pocket.goal || 0) - (pocket.saved || 0));
-  const months = monthsUntil(pocket.deadline) || 1;
-  if (remaining <= 0 || months <= 0) return;
-  const newMonthly = Math.ceil(remaining / months);
-  if (newMonthly === pocket.monthly) return;
-  if (confirm(`Mettre à jour le montant mensuel à ${formatNumber(newMonthly)}€ ?`)) {
-    const { error, data: updated } = await supabase
-      .from('pockets')
-      .update({ monthly: newMonthly })
-      .eq('id', pocket.id)
-      .select()
-      .single();
-    if (!error) {
-      if (updated) pockets[index] = updated; else pocket.monthly = newMonthly;
-      showPocketDetail(index);
-      displayPockets();
-      renderPockets();
-      updateTotals();
-      await showDistribution();
-      setTimeout(() => {
-        document.getElementById(`distributionCard-${index}`)?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else {
-      alert("Erreur lors de la mise à jour du montant mensuel");
-    }
   }
 }
 
@@ -856,7 +817,6 @@ async function addMoney(index, amount = null, description = null, date = null) {
   checkGoalCompletion(index);
   updateTotals();
   renderHomeHistory();
-  await promptMonthlyUpdate(index);
 }
 
 async function withdrawMoney(index, amount = null, description = null, date = null) {
@@ -890,7 +850,6 @@ async function withdrawMoney(index, amount = null, description = null, date = nu
   renderPockets();
   updateTotals();
   renderHomeHistory();
-  await promptMonthlyUpdate(index);
 }
 
 
