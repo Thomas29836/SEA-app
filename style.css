@@ -463,6 +463,27 @@ h3 {
   gap: 0.5rem;
 }
 
+/* Quick actions section */
+#quickActions {
+  margin-bottom: 1.5rem;
+}
+
+#quickActions h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.quick-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.quick-buttons .btn {
+  flex: 1;
+  border-radius: 0.5rem;
+}
+
     /* Forms */
     .form-group {
       margin-bottom: 1rem;
@@ -1128,7 +1149,7 @@ h3 {
 
 /* Home screen buttons */
 #homeAddPocketBtn {
-  background: #000;
+  background: linear-gradient(120deg, #ac54f1, #ea499b);
   color: #fff;
 }
 #homeAddPocketBtn .btn-plus {
@@ -1137,7 +1158,8 @@ h3 {
   font-weight: 700;
 }
 #homeAddPocketBtn:hover {
-  background: #000;
+  background: linear-gradient(120deg, #8c45c4, #c63d83);
+  color: #fff;
 }
 
 #refreshAccountsBtn {
@@ -1149,29 +1171,34 @@ h3 {
   background: #f8fafc;
 }
 #viewTransfersBtn {
-  background: #fff;
-  color: #475569;
-  border: 1px solid #d1d5db;
+  background: linear-gradient(120deg, #12b984, #15b8a3);
+  color: #ffffff;
+  font-weight: 500;  
 }
 #viewTransfersBtn:hover {
   background: #f8fafc;
+  color: #5c6967; 
+  border: 1px solid #d1d5db;  
 }
 #manageDistributionBtn {
-  background: #fff;
-  color: #475569;
-  border: 1px solid #d1d5db;
+  background: linear-gradient(120deg, #3787f3, #0ab1d7);
+  color: #ffffff;
+  font-weight: 500;  
 }
 #manageDistributionBtn:hover {
   background: #f8fafc;
+  color: #5c6967; 
+  border: 1px solid #d1d5db;  
 }
 
 /* Account modal add account button */
 #addAccountBtn {
-  background: #000;
+  background: linear-gradient(120deg, #ac54f1, #ea499b);
   color: #fff;
 }
 #addAccountBtn:hover {
-  background: #000;
+  background: linear-gradient(120deg, #8c45c4, #c63d83);
+  color: #fff;
 }
 
 /* Buttons inside form actions */

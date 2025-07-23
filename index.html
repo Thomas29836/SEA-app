@@ -88,12 +88,18 @@
         </div>
       </div>
 
+      <div id="quickActions" class="quick-actions">
+        <h3 class="quick-actions-title">Actions rapides</h3>
+        <div class="quick-buttons">
+          <button id="manageDistributionBtn" class="btn quick-btn">🔄 Répartir</button>
+          <button id="viewTransfersBtn" class="btn quick-btn">💳 Virements</button>
+        </div>
+      </div>
+
       <div class="section-header">
-        <h4>Mes poches d'épargne</h4>
+        <h3>Mes Objectifs</h3>
         <div class="header-actions">
-          <button id="viewTransfersBtn" class="btn btn-secondary">Voir les Virements</button>
-          <button id="manageDistributionBtn" class="btn btn-secondary">Gérer la Répartition</button>
-          <button id="homeAddPocketBtn" class="btn btn-primary"><span class="btn-plus">+</span> Nouvelle Poche</button>
+          <button id="homeAddPocketBtn" class="btn btn-primary"><span class="btn-plus">+</span>Nouveau</button>
         </div>
       </div>
       <div id="pocketsContainer" class="cards-grid"></div>
@@ -144,7 +150,7 @@
 
   <!-- Page Paramètres -->
  <div id="parametres" class="page">
-      <button type="button" class="btn btn-secondary" id="settingsBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
+      <button type="button" class="btn btn-secondary" id="settingsBackBtn" style="margin-bottom:1rem;">⬅️</button>
       <h2 style="margin-bottom: 1.5rem;">Paramètres</h2>
 
       <div class="card">
@@ -152,7 +158,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3>Informations utilisateur</h3>
             <button class="btn btn-secondary" id="editUserBtn" onclick="toggleUserEdit()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-              ✏️ Modifier
+              ✏️
             </button>
           </div>
           <div class="form-group">
@@ -186,7 +192,7 @@
         </div>          
         <button id="refreshAccountsBtn" class="btn btn-secondary" style="width: 100%;">Comptes Bancaires</button>
         <button class="btn btn-primary" onclick="logout()" style="width: 100%;">
-          🚪 Se déconnecter
+          Se déconnecter
         </button>
         </div>
       </div>
@@ -241,7 +247,7 @@
 
     <!-- Détail d'une poche d'épargne -->
     <div id="pocketDetail" class="page">
-      <button type="button" class="btn btn-secondary" id="detailBackBtn" style="margin-bottom:1rem;">⬅️ Accueil</button>
+      <button type="button" class="btn btn-secondary" id="detailBackBtn" style="margin-bottom:1rem;">⬅️</button>
       <div class="home-header">
         <div class="home-title">
           <h3 id="detailName"></h3>
