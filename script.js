@@ -401,11 +401,31 @@ function closeDistributionModal() {
 
 function autoDistribute() {
   if (pockets.length === 0) return;
-  const amountPerPocket = monthlyBudget / pockets.length;
+
+  // Calculer la mensualité requise pour chaque poche
+  let totalNeeded = 0;
   pockets.forEach(p => {
-    p.monthly = amountPerPocket;
-    supabase.from('pockets').update({ monthly: amountPerPocket }).eq('id', p.id);
+    if (!p.goal || p.saved >= p.goal) {
+      p._autoMonthly = 0;
+      return;
+    }
+    const remaining = Math.max(0, (p.goal || 0) - (p.saved || 0));
+    const monthsLeft = monthsUntil(p.deadline);
+    const months = monthsLeft > 0 ? monthsLeft : 1;
+    p._autoMonthly = remaining / months;
+    totalNeeded += p._autoMonthly;
   });
+
+  // Ajuster proportionnellement si le total dépasse le budget disponible
+  const ratio = totalNeeded > monthlyBudget ? monthlyBudget / totalNeeded : 1;
+
+  pockets.forEach(p => {
+    const monthly = (p._autoMonthly || 0) * ratio;
+    p.monthly = monthly;
+    delete p._autoMonthly;
+    supabase.from('pockets').update({ monthly }).eq('id', p.id);
+  });
+
   renderDistribution();
   updateDistributionSummary();
   updateTotals();
