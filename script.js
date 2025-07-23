@@ -76,17 +76,25 @@ async function loadAccounts() {
 }
 
 async function loadMonthlyBudget() {
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
+  const { data, error } = await supabase
+    .from('settings')
+    .select('monthly_budget')
+    .eq('user_id', userId)
+    .single();
+
+  if (error) {
     monthlyBudget = 500;
     return;
   }
-  const metaBudget = parseFloat(data.user.user_metadata?.monthly_budget);
+
+  const metaBudget = parseFloat(data?.monthly_budget);
   if (!isNaN(metaBudget)) {
     monthlyBudget = metaBudget;
   } else {
     monthlyBudget = 500;
-    await supabase.auth.updateUser({ data: { monthly_budget: monthlyBudget } });
+    await supabase
+      .from('settings')
+      .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });
   }
 }
 
@@ -439,7 +447,9 @@ function resetDistribution() {
 }
 
 async function saveDistribution() {
-  await supabase.auth.updateUser({ data: { monthly_budget: monthlyBudget } });
+  await supabase
+    .from('settings')
+    .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });
   await Promise.all(
     pockets.map(p =>
       supabase.from('pockets').update({ monthly: p.monthly }).eq('id', p.id)
@@ -1350,7 +1360,9 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         }
         monthlyBudget = newBudget;
-        await supabase.auth.updateUser({ data: { monthly_budget: monthlyBudget } });
+        await supabase
+          .from('settings')
+          .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });
         distributionChanged = true;
         updateTotals();
         renderDistribution();
