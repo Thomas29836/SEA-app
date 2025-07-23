@@ -1152,6 +1152,20 @@ h3 {
     width: 100%;
   }
 
+  /* Stack summary sections vertically on narrow screens */
+  .summary-card .sections {
+    flex-direction: column;
+  }
+
+  .summary-section:not(:last-child) {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .summary-section .amount {
+    font-size: 1.25rem;
+  }
+
   /* Responsive history tables */
   #historyTable,
   #homeHistoryTable {
