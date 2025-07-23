@@ -88,7 +88,6 @@
       <div class="section-header">
         <h4>Mes poches d'épargne</h4>
         <div class="header-actions">
-          <button id="refreshAccountsBtn" class="btn btn-secondary">Comptes Bancaires</button>
           <button id="viewTransfersBtn" class="btn btn-secondary">Voir les Virements</button>
           <button id="manageDistributionBtn" class="btn btn-secondary">Gérer la Répartition</button>
           <button id="homeAddPocketBtn" class="btn btn-primary"><span class="btn-plus">+</span> Nouvelle Poche</button>
@@ -174,9 +173,18 @@
 
         <div class="settings-section">
           <h3>Actions</h3>
-          <button class="btn btn-primary" onclick="logout()" style="width: 100%;">
-            🚪 Se déconnecter
-          </button>
+        <div class="budget-section">
+          <h4>Budget mensuel d&#233;pargne</h4>
+          <p class="subtext">Montant total que vous souhaitez &#233;pargner chaque mois</p>
+          <div class="budget-input-row">
+            <input type="number" id="monthlyBudgetInput" min="0" value="500" />
+            <span>€/mois</span>
+          </div>
+        </div>          
+        <button id="refreshAccountsBtn" class="btn btn-secondary" style="width: 100%;">Comptes Bancaires</button>
+        <button class="btn btn-primary" onclick="logout()" style="width: 100%;">
+          🚪 Se déconnecter
+        </button>
         </div>
       </div>
     </div>
@@ -295,16 +303,7 @@
   <!-- Gestion de la répartition -->
   <div id="distributionModal" class="modal-overlay">
     <div class="modal distribution-modal">
-      <button id="editDistributionBtn" class="btn btn-secondary btn-sm distribution-edit-btn" title="Modifier la répartition">✏️</button>
       <h3>Gestion de la Répartition</h3>
-      <div class="budget-section">
-        <h4>Budget mensuel d'épargne</h4>
-        <p class="subtext">Montant total que vous souhaitez épargner chaque mois</p>
-        <div class="budget-input-row">
-          <input type="number" id="monthlyBudgetInput" min="0" value="500" />
-          <span>€/mois</span>
-        </div>
-      </div>
       <div id="distributionSummary" class="stat-card distribution-summary">
         <h5>Épargne Mensuel</h5>
         <div class="amounts-row">
@@ -339,8 +338,11 @@
         <div class="section-header">
           <h4>Répartition par Poche</h4>
         </div>
-        <div id="distributionPocketsContainer" class="cards-grid"></div>        
-        <button type="button" class="btn btn-secondary" id="closeDistributionBtn" style="width:100%;margin-top:1rem;">Fermer</button>
+        <div id="distributionPocketsContainer" class="cards-grid"></div>
+        <div class="distribution-footer">
+          <button type="button" class="btn btn-secondary" id="closeDistributionBtn">Fermer</button>
+          <button type="button" class="btn btn-dark" id="saveDistributionBtn" disabled>Sauvegarder</button>
+        </div>
       </div>
     </div>
 

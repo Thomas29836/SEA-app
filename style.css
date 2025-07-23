@@ -313,6 +313,19 @@ h3 {
   background: #b91c1c;
 }
 
+/* Dark button used for saving */
+.btn-dark {
+  background: #000;
+  color: #fff;
+}
+
+.btn-dark:disabled {
+  background: #555;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
 /* Success and outline-danger buttons */
 .btn-success {
   background: #16a34a;
@@ -708,12 +721,6 @@ h3 {
   position: relative;
 }
 
-.distribution-edit-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-}
-
 .budget-section {
   margin-bottom: 1rem;
 }
@@ -739,6 +746,12 @@ h3 {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
+}
+
+.distribution-footer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .distribution-summary {

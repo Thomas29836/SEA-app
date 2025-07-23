@@ -6,6 +6,7 @@ let pockets = [];
 let accounts = [];
 // Budget mensuel d'épargne par défaut
 let monthlyBudget = 500;
+let distributionChanged = false;
 const accountColors = [
   '#f87171',
   '#fb923c',
@@ -386,9 +387,10 @@ async function showDistribution() {
   if (!modal) return;
   await loadMonthlyBudget();
   const input = document.getElementById('monthlyBudgetInput');
-  if (input) input.value = monthlyBudget.toFixed(2); 
-    renderDistribution();
-  updateDistributionSummary();    
+  if (input) input.value = monthlyBudget.toFixed(2);
+  renderDistribution();
+  distributionChanged = false;
+  updateDistributionSummary();
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -396,13 +398,9 @@ async function showDistribution() {
 function closeDistributionModal() {
   const modal = document.getElementById('distributionModal');
   if (!modal) return;
-  const allocated = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
-  if (Math.abs(allocated - monthlyBudget) > 0.01) {
-    alert('La répartition doit être exactement de 100% avant de fermer cette fenêtre.');
-    return;
-  }
   modal.classList.remove('active');
   document.body.style.overflow = '';
+  distributionChanged = false;  
 }
 
 function autoDistribute() {
@@ -419,6 +417,7 @@ function autoDistribute() {
   if (document.getElementById('pocketDetail')?.classList.contains('active')) {
     showPocketDetail(currentPocketIndex);
   }
+  distributionChanged = true;
 }
 
 function resetDistribution() {
@@ -436,6 +435,25 @@ function resetDistribution() {
   if (document.getElementById('pocketDetail')?.classList.contains('active')) {
     showPocketDetail(currentPocketIndex);
   }
+  distributionChanged = true;
+}
+
+async function saveDistribution() {
+  await supabase.auth.updateUser({ data: { monthly_budget: monthlyBudget } });
+  await Promise.all(
+    pockets.map(p =>
+      supabase.from('pockets').update({ monthly: p.monthly }).eq('id', p.id)
+    )
+  );
+  distributionChanged = false;
+  updateTotals();
+  renderDistribution();
+  updateDistributionSummary();
+  displayPockets();
+  if (document.getElementById('pocketDetail')?.classList.contains('active')) {
+    showPocketDetail(currentPocketIndex);
+  }
+  closeDistributionModal();  
 }
 
 function monthsToGoal(pocket, monthlyAmount) {
@@ -457,7 +475,6 @@ function updateDistributionSummary() {
   const percentEl = document.getElementById('distributionPercent');
   const barEl = document.getElementById('distributionProgressBar');
   const overEl = document.getElementById('distributionOverText');
-  const editBtn = document.getElementById('editDistributionBtn');
 
   if (totalEl) totalEl.textContent = `${formatNumber(total)} €`;
   if (allocatedEl) allocatedEl.textContent = `${formatNumber(allocated)} €`;
@@ -475,8 +492,13 @@ function updateDistributionSummary() {
   if (overEl) {
     overEl.style.display = available < 0 ? 'block' : 'none';
   }
-  if (editBtn) {
-    editBtn.style.display = Math.abs(available) > 0.01 ? 'block' : 'none';
+  const saveBtn = document.getElementById('saveDistributionBtn');
+  if (saveBtn) {
+    if (distributionChanged && available >= 0) {
+      saveBtn.disabled = false;
+    } else {
+      saveBtn.disabled = true;
+    }
   }
 }
 
@@ -555,6 +577,7 @@ function renderDistribution() {
       const m = monthsToGoal(pocket, newMonthly);
       monthsEl.textContent = m ? `Objectif atteint dans ${m} mois` : 'Objectif atteint';
       pocket.monthly = newMonthly;
+      distributionChanged = true;
       updateDistributionSummary();
       displayPockets();
       updateTotals();
@@ -566,13 +589,13 @@ function renderDistribution() {
       const newPercent = parseFloat(this.value);
       const newMonthly = (monthlyBudget * newPercent) / 100;
       pocket.monthly = newMonthly;
-      supabase.from('pockets').update({ monthly: newMonthly }).eq('id', pocket.id);
+      distributionChanged = true;
       updateTotals();
       updateDistributionSummary();
       displayPockets();
       if (document.getElementById('pocketDetail')?.classList.contains('active') && pockets[currentPocketIndex] === pocket) {
         showPocketDetail(currentPocketIndex);
-      }      
+      }
     });
 
     right.appendChild(monthlyEl);
@@ -1289,9 +1312,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const closeTransfersBtn = document.getElementById('closeTransfersBtn');
   const transfersModal = document.getElementById('transfersModal');
   const closeDistributionBtn = document.getElementById('closeDistributionBtn');
-  const editDistributionBtn = document.getElementById('editDistributionBtn');
+  const saveDistributionBtn = document.getElementById('saveDistributionBtn');
   const distributionModal = document.getElementById('distributionModal');
-    const autoDistributionBtn = document.getElementById('autoDistributionBtn');
+  const autoDistributionBtn = document.getElementById('autoDistributionBtn');
   const resetDistributionBtn = document.getElementById('resetDistributionBtn');
   const monthlyBudgetInput = document.getElementById('monthlyBudgetInput');  
   if (closeTransfersBtn) {
@@ -1307,12 +1330,8 @@ document.addEventListener('DOMContentLoaded', function() {
   if (closeDistributionBtn) {
     closeDistributionBtn.addEventListener('click', closeDistributionModal);
   }
-  if (editDistributionBtn) {
-    editDistributionBtn.addEventListener('click', function() {
-      document.getElementById('distributionPocketsContainer')?.scrollIntoView({
-        behavior: 'smooth'
-      });
-    });
+  if (saveDistributionBtn) {
+    saveDistributionBtn.addEventListener('click', saveDistribution);
   }
     if (autoDistributionBtn) {
     autoDistributionBtn.addEventListener('click', autoDistribute);
@@ -1321,26 +1340,26 @@ document.addEventListener('DOMContentLoaded', function() {
     resetDistributionBtn.addEventListener('click', resetDistribution);
   }
   if (monthlyBudgetInput) {
-    monthlyBudgetInput.addEventListener('change', async function() {
-      const newBudget = parseFloat(this.value) || 0;
-      const currentTotal = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
-      if (currentTotal > 0) {
-        const ratio = newBudget / currentTotal;
-        pockets.forEach(p => {
-          p.monthly = (p.monthly || 0) * ratio;
-        });
-      }
-      monthlyBudget = newBudget;
-      await supabase.auth.updateUser({ data: { monthly_budget: newBudget } });      
-      updateTotals();
-      renderDistribution();
-      updateDistributionSummary();
-      displayPockets();
-      if (document.getElementById('pocketDetail')?.classList.contains('active')) {
-        showPocketDetail(currentPocketIndex);
-      }
-    });
-  } 
+      monthlyBudgetInput.addEventListener('change', async function() {
+        const newBudget = parseFloat(this.value) || 0;
+        const currentTotal = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+        if (currentTotal > 0) {
+          const ratio = newBudget / currentTotal;
+          pockets.forEach(p => {
+            p.monthly = (p.monthly || 0) * ratio;
+          });
+        }
+        monthlyBudget = newBudget;
+        distributionChanged = true;
+        updateTotals();
+        renderDistribution();
+        updateDistributionSummary();
+        displayPockets();
+        if (document.getElementById('pocketDetail')?.classList.contains('active')) {
+          showPocketDetail(currentPocketIndex);
+        }
+      });
+    }
   if (distributionModal) {
     distributionModal.addEventListener('click', function(e) {
       if (e.target === this) {
@@ -1784,7 +1803,12 @@ async function deleteAccount(index) {
 }
 
 // Navigate to the settings page from the shortcut icon
-function goToSettings() {
+async function goToSettings() {
+  await loadMonthlyBudget();
+  const input = document.getElementById('monthlyBudgetInput');
+  if (input) {
+    input.value = monthlyBudget.toFixed(2);
+  }
   showPage(null, 'parametres');
   const tabs = document.querySelectorAll('.nav-tab');
   tabs.forEach(tab => tab.classList.remove('active'));
@@ -1823,4 +1847,5 @@ window.closeDistributionModal = closeDistributionModal;
 window.closeTransfersModal = closeTransfersModal;
 window.autoDistribute = autoDistribute;
 window.resetDistribution = resetDistribution;
+window.saveDistribution = saveDistribution;
 window.renderHomeHistory = renderHomeHistory;
