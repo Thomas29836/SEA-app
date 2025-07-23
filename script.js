@@ -82,13 +82,26 @@ async function loadMonthlyBudget() {
     .eq('user_id', userId)
     .single();
 
-  if (!error && data?.monthly_budget !== undefined && data?.monthly_budget !== null) {
+  if (error) {
+    console.error('Error fetching monthly budget:', error);
+    alert('Erreur lors du chargement du budget mensuel');
+    return;
+  }
+
+  if (data?.monthly_budget !== undefined && data?.monthly_budget !== null) {
     monthlyBudget = parseFloat(data.monthly_budget);
   } else {
     monthlyBudget = 500;
-    await supabase
+    const { error: upsertError } = await supabase
       .from('settings')
-      .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });    
+      .upsert(
+        { user_id: userId, monthly_budget: monthlyBudget },
+        { onConflict: 'user_id' }
+      );
+    if (upsertError) {
+      console.error('Error saving monthly budget:', upsertError);
+      alert("Erreur lors de l'enregistrement du budget mensuel");
+    }
   }
 }
 
@@ -441,9 +454,15 @@ function resetDistribution() {
 }
 
 async function saveDistribution() {
-  await supabase
+  const { error: budgetError } = await supabase
     .from('settings')
     .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });
+  if (budgetError) {
+    console.error('Error saving monthly budget:', budgetError);
+    alert("Erreur lors de l'enregistrement du budget mensuel");
+  } else {
+    await loadMonthlyBudget();
+  }
   await Promise.all(
     pockets.map(p =>
       supabase.from('pockets').update({ monthly: p.monthly }).eq('id', p.id)
@@ -1354,9 +1373,18 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         }
         monthlyBudget = newBudget;
-        await supabase
+        const { error: upsertError } = await supabase
           .from('settings')
-          .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });
+          .upsert(
+            { user_id: userId, monthly_budget: monthlyBudget },
+            { onConflict: 'user_id' }
+          );
+        if (upsertError) {
+          console.error('Error saving monthly budget:', upsertError);
+          alert("Erreur lors de l'enregistrement du budget mensuel");
+        } else {
+          await loadMonthlyBudget();
+        }
         distributionChanged = true;
         updateTotals();
         renderDistribution();
