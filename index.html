@@ -312,9 +312,9 @@
   <!-- Gestion de la répartition -->
   <div id="distributionModal" class="modal-overlay">
     <div class="modal distribution-modal">
+      <div class="modal-handle"></div>
       <h3>Gestion de la Répartition</h3>
       <div id="distributionSummary" class="stat-card distribution-summary">
-        <h5>Épargne Mensuel</h5>
         <div class="amounts-row">
           <div class="amount-col">
             <p class="label">Épargne totale</p>
@@ -335,14 +335,11 @@
         </div>
         <div class="progress">
           <div class="progress-bar" id="distributionProgressBar"></div>
-        </div>
-        <p id="distributionOverText" class="distribution-warning" style="display:none;">
-          La répartition dépasse 100%
-        </p>        
+        </div> 
       </div>      
         <div class="distribution-actions">
-          <button type="button" class="btn btn-secondary" id="autoDistributionBtn">Répartition automatique</button>
-          <button type="button" class="btn btn-secondary" id="resetDistributionBtn">Remettre à zéro</button>
+          <button type="button" class="btn auto-btn" id="autoDistributionBtn"><span class="icon">⚡</span> Répartition auto</button>
+          <button type="button" class="btn reset-btn" id="resetDistributionBtn"><span class="icon">♺</span> Remettre à zéro</button>
         </div>
         <div class="section-header">
           <h4>Répartition par Poche</h4>

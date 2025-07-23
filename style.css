@@ -379,12 +379,12 @@ h3 {
 
 /* Dark button used for saving */
 .btn-dark {
-  background: #000;
+  background: linear-gradient(to right, #8b5cf6, #d946ef);
   color: #fff;
 }
 
 .btn-dark:disabled {
-  background: #555;
+  background: #a78bfa;
   color: #fff;
   cursor: not-allowed;
   opacity: 0.8;
@@ -408,6 +408,35 @@ h3 {
 
 .btn-outline-danger:hover {
   background: #fef2f2;
+}
+
+/* Buttons for distribution actions */
+#autoDistributionBtn.auto-btn {
+  background: linear-gradient(to right, #3b82f6, #06b6d4);
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+#autoDistributionBtn.auto-btn:hover {
+  filter: brightness(1.1);
+}
+
+#resetDistributionBtn.reset-btn {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+#resetDistributionBtn.reset-btn:hover {
+  background: #f9fafb;
+}
+
+.distribution-actions .icon {
+  margin-right: 0.25rem;
 }
 
 /* Actions below pocket detail cards */
@@ -806,8 +835,42 @@ h3 {
 
 /* Gestion de la répartition */
 .distribution-modal {
-  max-width: 500px;
+  width: 100%;
+  max-width: none;
+  height: 80vh;
+  max-height: 80vh;
+  border-radius: 1rem 1rem 0 0;
+  margin: 0;
   position: relative;
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+#distributionModal.modal-overlay {
+  align-items: flex-end;
+}
+
+#distributionModal.modal-overlay.active .distribution-modal {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#distributionModal.closing {
+  visibility: visible;
+}
+
+#distributionModal.closing .distribution-modal {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  background: #d1d5db;
+  border-radius: 2px;
+  margin: 0 auto 0.75rem;
 }
 
 .budget-section {
@@ -889,13 +952,6 @@ h3 {
 .distribution-summary .progress-percent {
   font-size: 0.8rem;
   color: #000;
-}
-
-.distribution-warning {
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-align: center;
-  color: #dc2626;  
 }
 
 .positive {

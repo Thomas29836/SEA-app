@@ -7,6 +7,13 @@ let accounts = [];
 // Budget mensuel d'épargne par défaut
 let monthlyBudget = 500;
 let distributionChanged = false;
+
+function isDistributionOverLimit() {
+  const total = monthlyBudget;
+  const allocated = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
+  const percent = total > 0 ? (allocated / total) * 100 : 0;
+  return percent > 100.1;
+}
 const accountColors = [
   '#f87171',
   '#fb923c',
@@ -368,6 +375,7 @@ function showTransfers() {
 async function showDistribution() {
   const modal = document.getElementById('distributionModal');
   if (!modal) return;
+  modal.classList.remove('closing');
   await loadMonthlyBudget();
   const input = document.getElementById('monthlyBudgetInput');
   if (input) input.value = monthlyBudget.toFixed(2);
@@ -381,9 +389,14 @@ async function showDistribution() {
 function closeDistributionModal() {
   const modal = document.getElementById('distributionModal');
   if (!modal) return;
+  if (isDistributionOverLimit()) return;  
+  modal.classList.add('closing');
   modal.classList.remove('active');
-  document.body.style.overflow = '';
-  distributionChanged = false;  
+  setTimeout(() => {
+    modal.classList.remove('closing');
+    document.body.style.overflow = '';
+  }, 400);
+  distributionChanged = false;
 }
 
 function autoDistribute() {
@@ -458,14 +471,15 @@ function updateDistributionSummary() {
   const total = monthlyBudget;
   const allocated = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
   const available = total - allocated;
-  const percent = total > 0 ? Math.min(100, (allocated / total) * 100) : 0;
+  const percent = total > 0 ? (allocated / total) * 100 : 0;
+  const clampedPercent = Math.min(100, percent);
 
   const totalEl = document.getElementById('distributionTotal');
   const allocatedEl = document.getElementById('distributionAllocated');
   const availableEl = document.getElementById('distributionAvailable');
   const percentEl = document.getElementById('distributionPercent');
   const barEl = document.getElementById('distributionProgressBar');
-  const overEl = document.getElementById('distributionOverText');
+  const closeBtn = document.getElementById('closeDistributionBtn');  
 
   if (totalEl) totalEl.textContent = `${formatNumber(total)} €`;
   if (allocatedEl) allocatedEl.textContent = `${formatNumber(allocated)} €`;
@@ -478,11 +492,12 @@ function updateDistributionSummary() {
       availableEl.classList.add('positive');
     }
   }
-  if (percentEl) percentEl.textContent = Math.round(percent) + ' %';
-  if (barEl) barEl.style.width = percent + '%';
-  if (overEl) {
-    overEl.style.display = available < 0 ? 'block' : 'none';
+  if (percentEl) percentEl.textContent = Math.round(clampedPercent) + ' %';
+  if (barEl) {
+    barEl.style.width = clampedPercent + '%';
+    barEl.style.background = percent <= 100 ? '#22c55e' : '#ef4444';
   }
+  if (closeBtn) closeBtn.disabled = percent > 100.1;
   const saveBtn = document.getElementById('saveDistributionBtn');
   if (saveBtn) {
     if (distributionChanged && available >= 0) {
