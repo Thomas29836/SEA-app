@@ -213,6 +213,70 @@ h3 {
       color: #64748b;
     }
 
+/* Global savings summary card */
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(90deg, #7c3aed, #ec4899, #db2777);
+  color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card .sections {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.summary-section {
+  flex: 1;
+  text-align: center;
+}
+
+.summary-section:not(:last-child) {
+  margin-right: 1rem;
+}
+
+.summary-section .label {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.summary-section .amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.summary-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#summaryCard .progress {
+  background: rgba(255, 255, 255, 0.4);
+  height: 6px;
+  border-radius: 0.25rem;
+  flex: 1;
+  overflow: hidden;
+  margin: 0;
+}
+
+#summaryCard .progress-bar {
+  background: linear-gradient(90deg, #facc15, #f97316);
+  height: 100%;
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+.summary-progress span {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
     /* Grid for pockets */
     .cards-grid {
       display: grid;
@@ -565,6 +629,10 @@ h3 {
 .pocket-card .saved-amount,
 .pocket-card .goal-amount {
   font-weight: 700;
+}
+
+.pocket-card .goal-amount {
+  margin: 0.25rem 0;
 }
 
 .pocket-card .amounts-row {

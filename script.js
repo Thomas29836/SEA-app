@@ -127,7 +127,7 @@ function updateTotals() {
   const progressEl = document.getElementById('overallProgressPercent');
   const progressBarEl = document.getElementById('overallProgressBar');
   if (savedEl) savedEl.textContent = `${formatNumber(totalSaved)}€`;
-  if (goalsEl) goalsEl.textContent = `sur ${formatNumber(totalGoals)}€ d'objectifs`;
+  if (goalsEl) goalsEl.textContent = `${formatNumber(totalGoals)}€`;
   if (monthlyEl) monthlyEl.textContent = `${formatNumber(totalMonthly)}€/mois`;
   const percent = totalGoals ? Math.min(100, (totalSaved / totalGoals) * 100) : 0;
   if (progressEl) progressEl.textContent = percent.toFixed(0) + '%';
@@ -273,8 +273,10 @@ function displayPockets() {
         title.className = 'pocket-title';
         title.textContent = pocket.name;
 
-        const progressWrapper = document.createElement('div');
-        progressWrapper.className = 'progress-wrapper';
+        const goalText = document.createElement('p');
+        goalText.className = 'goal-amount';
+        goalText.textContent = `${formatNumber(pocket.goal)}€`;
+
         const progress = document.createElement('div');
         progress.className = 'progress';
         const bar = document.createElement('div');
@@ -282,44 +284,10 @@ function displayPockets() {
         const percent = pocket.goal ? Math.min(100, (pocket.saved / pocket.goal) * 100) : 0;
         bar.style.width = percent + '%';
         progress.appendChild(bar);
-        const percentLabel = document.createElement('span');
-        percentLabel.className = 'progress-percent';
-        percentLabel.textContent = percent.toFixed(0) + '%';
-        progressWrapper.appendChild(progress);
-        progressWrapper.appendChild(percentLabel);
-
-        const amountsRow = document.createElement('div');
-        amountsRow.className = 'amounts-row';
-
-        const savedCol = document.createElement('div');
-        const savedLabel = document.createElement('p');
-        savedLabel.textContent = 'Épargné';
-        const savedAmount = document.createElement('p');
-        savedAmount.className = 'saved-amount';
-        savedAmount.textContent = `${formatNumber(pocket.saved)}€`;
-        savedCol.appendChild(savedLabel);
-        savedCol.appendChild(savedAmount);
-
-        const goalCol = document.createElement('div');
-        const goalLabel = document.createElement('p');
-        goalLabel.textContent = 'Objectif';
-        const goalAmount = document.createElement('p');
-        goalAmount.className = 'goal-amount';
-        goalAmount.textContent = `${formatNumber(pocket.goal)}€`;
-        goalCol.appendChild(goalLabel);
-        goalCol.appendChild(goalAmount);
-
-        amountsRow.appendChild(savedCol);
-        amountsRow.appendChild(goalCol);
-
-        const deadline = document.createElement('p');
-        deadline.className = 'deadline';
-        deadline.textContent = `Échéance : ${formatDateDisplay(pocket.deadline)}`;
 
         card.appendChild(title);
-        card.appendChild(progressWrapper);
-        card.appendChild(amountsRow);
-        card.appendChild(deadline);
+        card.appendChild(goalText);
+        card.appendChild(progress);        
 
       container.appendChild(card);
     });

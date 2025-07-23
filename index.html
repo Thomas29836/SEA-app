@@ -65,23 +65,26 @@
         </div>
         <a href="#" id="settingsShortcut" class="settings-icon" onclick="goToSettings()" title="Paramètres">⚙️</a>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h5>Total épargné</h5>
-          <p id="totalSavedAmount">0€</p>
-          <p class="subtext" id="totalGoalsAmount">sur 0€ d'objectifs</p>
+      <div id="summaryCard" class="summary-card">
+        <div class="sections">
+          <div class="summary-section">
+            <p class="label">Épargne totale</p>
+            <p class="amount" id="totalSavedAmount">0€</p>
+          </div>
+          <div class="summary-section">
+            <p class="label">Objectif</p>
+            <p class="amount" id="totalGoalsAmount">0€</p>
+          </div>
+          <div class="summary-section" id="monthlyCard">
+            <p class="label">Par mois</p>
+            <p class="amount" id="totalMonthlyAmount">0€/mois</p>
+          </div>
         </div>
-        <div class="stat-card" id="monthlyCard">
-          <h5>Épargne Mensuelle</h5>
-          <p id="totalMonthlyAmount">0€/mois</p>
-          <p class="subtext">automatique chaque mois</p>
-        </div>
-        <div class="stat-card">
-          <h5>Progression globale</h5>
-          <p><strong id="overallProgressPercent">0%</strong></p>
+        <div class="summary-progress">
           <div class="progress">
             <div class="progress-bar" id="overallProgressBar"></div>
           </div>
+          <span id="overallProgressPercent">0%</span>
         </div>
       </div>
 
