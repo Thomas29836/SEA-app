@@ -80,7 +80,7 @@ async function loadMonthlyBudget() {
     .from('settings')
     .select('monthly_budget')
     .eq('user_id', userId)
-    .single();
+    .maybeSingle(); // accept absence of row
 
   if (error) {
     console.error('Error fetching monthly budget:', error);
@@ -88,16 +88,17 @@ async function loadMonthlyBudget() {
     return;
   }
 
-  if (data?.monthly_budget !== undefined && data?.monthly_budget !== null) {
-    monthlyBudget = parseFloat(data.monthly_budget);
+  if (data) {
+    monthlyBudget = parseFloat(data.monthly_budget) || 0;
   } else {
+    // no row -> create default
     monthlyBudget = 500;
     const { error: upsertError } = await supabase
       .from('settings')
-      .upsert(
-        { user_id: userId, monthly_budget: monthlyBudget },
-        { onConflict: 'user_id' }
-      );
+      .upsert({ user_id: userId, monthly_budget: monthlyBudget }, {
+        onConflict: 'user_id',
+      });
+
     if (upsertError) {
       console.error('Error saving monthly budget:', upsertError);
       alert("Erreur lors de l'enregistrement du budget mensuel");
