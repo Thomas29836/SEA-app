@@ -1350,6 +1350,7 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         }
         monthlyBudget = newBudget;
+        await supabase.auth.updateUser({ data: { monthly_budget: monthlyBudget } });
         distributionChanged = true;
         updateTotals();
         renderDistribution();
