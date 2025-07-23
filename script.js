@@ -86,6 +86,9 @@ async function loadMonthlyBudget() {
     monthlyBudget = parseFloat(data.monthly_budget);
   } else {
     monthlyBudget = 500;
+    await supabase
+      .from('settings')
+      .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });    
   }
 }
 
@@ -1341,7 +1344,7 @@ document.addEventListener('DOMContentLoaded', function() {
     resetDistributionBtn.addEventListener('click', resetDistribution);
   }
   if (monthlyBudgetInput) {
-      monthlyBudgetInput.addEventListener('change', async function() {
+      monthlyBudgetInput.addEventListener('input', async function() {
         const newBudget = parseFloat(this.value) || 0;
         const currentTotal = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
         if (currentTotal > 0) {
