@@ -82,19 +82,10 @@ async function loadMonthlyBudget() {
     .eq('user_id', userId)
     .single();
 
-  if (error) {
-    monthlyBudget = 500;
-    return;
-  }
-
-  const metaBudget = parseFloat(data?.monthly_budget);
-  if (!isNaN(metaBudget)) {
-    monthlyBudget = metaBudget;
+  if (!error && data?.monthly_budget !== undefined && data?.monthly_budget !== null) {
+    monthlyBudget = parseFloat(data.monthly_budget);
   } else {
     monthlyBudget = 500;
-    await supabase
-      .from('settings')
-      .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });
   }
 }
 
