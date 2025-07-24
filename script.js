@@ -321,6 +321,23 @@ function showPocketDetail(index) {
   document.getElementById('detailProgressPercent').textContent = percent.toFixed(0) + '%';
   document.getElementById('detailFrom').textContent = pocket.from || '-';
   document.getElementById('detailTo').textContent = pocket.to || '-';
+  const level = pocket.priority || 3;
+  const label = document.getElementById('detailPriorityLabel');
+  const desc = document.getElementById('detailPriorityDesc');
+  const descriptions = {
+    1: 'Très haute (urgence, sécurité)',
+    2: 'Haute (projets importants)',
+    3: 'Normale (projets courants)',
+    4: 'Basse (projets futurs)',
+    5: 'Très basse (souhaits)'
+  };
+  if (label) {
+    label.textContent = `Niveau ${level}`;
+    label.className = `priority-label priority-${level}`;
+  }
+  if (desc) {
+    desc.textContent = descriptions[level] || '';
+  }
   showPage(null, 'pocketDetail');
   renderHistory(index, 1);
 }
@@ -534,7 +551,11 @@ function renderDistribution() {
   container.innerHTML = '';
   const totalMonthly = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
 
-  pockets.forEach((pocket, idx) => {
+  const sorted = [...pockets].sort(
+    (a, b) => (a.priority || 3) - (b.priority || 3)
+  );
+
+  sorted.forEach((pocket, idx) => {
     const percent = monthlyBudget ? ((pocket.monthly || 0) / monthlyBudget) * 100 : 0;
 
     const card = document.createElement('div');
@@ -573,6 +594,19 @@ function renderDistribution() {
     monthsEl.textContent = months ? `Objectif atteint dans ${months} mois` : 'Objectif atteint';
 
     left.appendChild(nameRow);
+    const priority = pocket.priority || 3;
+    const priorityEl = document.createElement('p');
+    priorityEl.className = 'dist-priority';
+    priorityEl.textContent = `Niveau ${priority}`;
+    const colors = {
+      1: '#FF4D4F',
+      2: '#FA8C16',
+      3: '#1890FF',
+      4: '#52C41A',
+      5: '#8C8C8C',
+    };
+    priorityEl.style.color = colors[priority] || '#64748b';
+    left.appendChild(priorityEl);
     left.appendChild(totalText);
     left.appendChild(progress);
     left.appendChild(monthsEl);
@@ -740,7 +774,11 @@ function openPocketForm(index = -1) {
       document.getElementById('pocketFrom').value = p.from || '';
       document.getElementById('pocketTo').value = p.to || '';
       document.getElementById('pocketDeadline').value = p.deadline || '';
+      document.getElementById('pocketPriority').value = p.priority || '3';
     }
+  }
+  else {
+    document.getElementById('pocketPriority').value = '3';
   }
 
   document.getElementById('pocketModal').classList.add('active');
@@ -764,6 +802,7 @@ async function savePocket(e) {
     from: document.getElementById('pocketFrom').value,
     to: document.getElementById('pocketTo').value,
     deadline: document.getElementById('pocketDeadline').value,
+    priority: parseInt(document.getElementById('pocketPriority').value, 10) || 3,
   };
 
   if (index >= 0 && pockets[index]) {

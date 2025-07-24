@@ -226,6 +226,16 @@
           <input type="date" id="pocketDeadline">
         </div>
         <div class="form-group">
+          <label for="pocketPriority">Priorité</label>
+          <select id="pocketPriority">
+            <option value="1">Priorité 1 – Très haute (urgence, sécurité)</option>
+            <option value="2">Priorité 2 – Haute (projets importants)</option>
+            <option value="3" selected>Priorité 3 – Normale (projets courants)</option>
+            <option value="4">Priorité 4 – Basse (projets futurs)</option>
+            <option value="5">Priorité 5 – Très basse (souhaits)</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label for="pocketFrom">Compte à prélever</label>
           <select id="pocketFrom">
             <option value="">--Choisissez un compte--</option>
@@ -283,6 +293,11 @@
           <h4>Comptes bancaires</h4>
           <p>Prélèvement : <span id="detailFrom"></span></p>
           <p>Destinataire : <span id="detailTo"></span></p>
+        </div>
+        <div class="stat-card" id="priorityCard">
+          <h4>Priorité</h4>
+          <p><span id="detailPriorityLabel" class="priority-label priority-3">Niveau 3</span></p>
+          <p id="detailPriorityDesc" class="subtext">Normale (projets courants)</p>
         </div>
       </div>
       <div class="money-actions">

@@ -338,6 +338,19 @@ h3 {
   font-weight: 400;
 }
 
+.priority-label {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+.priority-1 { background: #FF4D4F; }
+.priority-2 { background: #FA8C16; }
+.priority-3 { background: #1890FF; }
+.priority-4 { background: #52C41A; }
+.priority-5 { background: #8C8C8C; }
+
     /* Buttons */
 .btn {
   padding: 0.75rem 1.5rem;
@@ -973,6 +986,12 @@ h3 {
   align-items: center;
   gap: 0.25rem;
   font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.distribution-card .dist-priority {
+  font-size: 0.8rem;
+  font-weight: 500;
   margin-bottom: 0.25rem;
 }
 
