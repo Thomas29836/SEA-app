@@ -137,6 +137,22 @@ function endOnboarding() {
   showPage(null, 'accueil');
 }
 
+function shouldSkipOnboarding() {
+  const hasMonthly = monthlyBudget !== null && monthlyBudget !== undefined;
+  const hasCourant = accounts.some(a => a.type === 'courant');
+  const hasEpargne = accounts.some(a => a.type === 'epargne');
+  return hasMonthly && hasCourant && hasEpargne;
+}
+
+function checkOnboardingAfterInit() {
+  if (shouldSkipOnboarding()) {
+    document.querySelector('.content').style.display = '';
+    showPage(null, 'accueil');
+  } else {
+    startOnboarding();
+  }
+}
+
 function updateOnboardingAccounts() {
   const list = document.getElementById('obAccountsList');
   const nextBtn = document.getElementById('obStep3Next');
@@ -1327,7 +1343,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   await initData();
 
   document.getElementById('loginPage').style.display = 'none';
-  startOnboarding();
+  checkOnboardingAfterInit();
 });
 
 // Changement vers la page d'inscription
@@ -1415,7 +1431,7 @@ document.addEventListener('DOMContentLoaded', function() {
       await initData();
       if (loginPage) loginPage.style.display = 'none';
       if (registerPage) registerPage.style.display = 'none';
-      startOnboarding();
+      checkOnboardingAfterInit();
     } else {
       if (navTabs) navTabs.style.display = 'none';
       if (content) content.style.display = 'none';
