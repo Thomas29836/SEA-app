@@ -1308,3 +1308,60 @@ h3 {
 .form-actions .btn-secondary:hover {
   background: #f8fafc;
 }
+
+/* Onboarding */
+.hidden {
+  display: none;
+}
+
+#onboarding {
+  padding: 2rem 1rem;
+  max-width: 500px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.onboarding-logo {
+  width: 80px;
+  margin: 1rem auto;
+  display: block;
+}
+
+.progress-bar-container {
+  background: #e5e7eb;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+#onboardingProgressBar {
+  height: 100%;
+  width: 0;
+  background: #3b82f6;
+  transition: width 0.3s;
+}
+
+.progress-label {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  color: #64748b;
+}
+
+.onboarding-step {
+  display: none;
+}
+
+.onboarding-step:not(.hidden) {
+  display: block;
+}
+
+.simple-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.simple-list li {
+  padding: 0.25rem 0;
+}

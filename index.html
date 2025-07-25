@@ -54,6 +54,64 @@
     </div>
   </div>
 
+  <div id="onboarding" style="display:none;">
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="onboardingProgressBar"></div>
+    </div>
+    <p id="onboardingStepText" class="progress-label">Étape 1/7</p>
+
+    <div id="ob-step1" class="onboarding-step">
+      <div class="onboarding-brand">FEEN</div>
+      <h2>Épargner sans y penser</h2>
+      <p>En 2 minutes, configure ton épargne et tes premières poches.</p>
+      <button id="obStartBtn" class="btn btn-primary">Commencer</button>
+    </div>
+
+    <div id="ob-step2" class="onboarding-step hidden">
+      <p>Combien souhaites-tu épargner chaque mois&nbsp;?</p>
+      <div class="budget-input-row" style="justify-content:center;">
+        <input type="range" id="obMonthlyRange" min="0" max="2000" step="10" />
+        <input type="number" id="obMonthlyInput" min="0" step="10" />
+        <span>€/mois</span>
+      </div>
+      <button id="obStep2Next" class="btn btn-primary" style="margin-top:1rem;">Continuer</button>
+    </div>
+
+    <div id="ob-step3" class="onboarding-step hidden">
+      <p>Ajoute tes comptes pour alimenter tes poches d’épargne.</p>
+      <button id="obAddAccount" class="btn btn-primary" style="margin:1rem 0;">Ajouter un compte</button>
+      <ul id="obAccountsList" class="simple-list"></ul>
+      <button id="obStep3Next" class="btn btn-primary" disabled>Continuer</button>
+    </div>
+
+    <div id="ob-step4" class="onboarding-step hidden">
+      <button id="obCreatePocket" class="btn btn-primary" style="margin-bottom:1rem;">Créer ma première poche</button>
+      <ul id="obPocketsList" class="simple-list"></ul>
+      <button id="obStep4Next" class="btn btn-primary" disabled>Continuer</button>
+    </div>
+
+    <div id="ob-step5" class="onboarding-step hidden">
+      <p>Veux-tu ajouter d’autres poches maintenant&nbsp;?</p>
+      <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;">
+        <button id="obAddPocketYes" class="btn btn-secondary">Oui, ajouter une poche</button>
+        <button id="obAddPocketNo" class="btn btn-primary">Non, continuer</button>
+      </div>
+    </div>
+
+    <div id="ob-step6" class="onboarding-step hidden">
+      <p>Souhaites-tu activer la répartition automatique entre tes poches&nbsp;?</p>
+      <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;">
+        <button id="obAutoYes" class="btn btn-primary">Oui, activer</button>
+        <button id="obAutoNo" class="btn btn-secondary">Non, configurer moi-même</button>
+      </div>
+    </div>
+
+    <div id="ob-step7" class="onboarding-step hidden">
+      <p>Bravo 🎉 ! Ton épargne est prête.</p>
+      <button id="obFinish" class="btn btn-primary" style="margin-top:1rem;">Voir mes poches</button>
+    </div>
+  </div>
+
   <!-- Navigation removed -->
 <div class="content" style="display:none;">
     <!-- Page d'accueil/tableau de bord SEA -->

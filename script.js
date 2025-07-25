@@ -8,6 +8,12 @@ let accounts = [];
 let monthlyBudget = 500;
 let distributionChanged = false;
 
+// Onboarding state
+const onboarding = {
+  step: 1,
+  epargneMensuelle: 0,
+};
+
 function isDistributionOverLimit() {
   const total = monthlyBudget;
   const allocated = pockets.reduce((sum, p) => sum + (p.monthly || 0), 0);
@@ -95,6 +101,64 @@ function displayRecommendations(message, zeroNames = []) {
     .join('');
   box.innerHTML = `<h4 class="recommendation-title">${title}</h4><ul class="recommendation-list">${itemsHtml}</ul>`;
   box.style.display = 'block';
+}
+
+function showOnboardingStep(step) {
+  onboarding.step = step;
+  document.querySelectorAll('.onboarding-step').forEach(d => d.classList.add('hidden'));
+  const el = document.getElementById(`ob-step${step}`);
+  if (el) el.classList.remove('hidden');
+  const percent = (step - 1) / 6 * 100;
+  const bar = document.getElementById('onboardingProgressBar');
+  if (bar) bar.style.width = percent + '%';
+  const txt = document.getElementById('onboardingStepText');
+  if (txt) txt.textContent = `Étape ${step}/7`;
+  if (step === 3) updateOnboardingAccounts();
+  if (step === 4 || step === 5) updateOnboardingPockets();
+}
+
+function startOnboarding() {
+  const ob = document.getElementById('onboarding');
+  if (!ob) return;
+  document.querySelector('.content').style.display = 'none';
+  ob.style.display = '';
+  showOnboardingStep(1);
+}
+
+function endOnboarding() {
+  const ob = document.getElementById('onboarding');
+  if (!ob) return;
+  ob.style.display = 'none';
+  document.querySelector('.content').style.display = '';
+  updateTotals();
+  displayPockets();
+  showPage(null, 'accueil');
+}
+
+function updateOnboardingAccounts() {
+  const list = document.getElementById('obAccountsList');
+  const nextBtn = document.getElementById('obStep3Next');
+  if (!list || !nextBtn) return;
+  list.innerHTML = '';
+  accounts.forEach(acc => {
+    const li = document.createElement('li');
+    li.textContent = acc.bank ? `${acc.name} - ${acc.bank}` : acc.name;
+    list.appendChild(li);
+  });
+  nextBtn.disabled = accounts.length < 2;
+}
+
+function updateOnboardingPockets() {
+  const list = document.getElementById('obPocketsList');
+  const nextBtn = document.getElementById('obStep4Next');
+  if (!list || !nextBtn) return;
+  list.innerHTML = '';
+  pockets.forEach(p => {
+    const li = document.createElement('li');
+    li.textContent = p.name;
+    list.appendChild(li);
+  });
+  nextBtn.disabled = pockets.length < 1;
 }
 
 async function loadPockets() {
@@ -459,6 +523,9 @@ function closeDistributionModal() {
     document.body.style.overflow = '';
   }, 400);
   distributionChanged = false;
+  if (document.getElementById('ob-step6')) {
+    showOnboardingStep(7);
+  }
 }
 
 async function autoDistribute() {
@@ -868,6 +935,9 @@ function openPocketForm(index = -1) {
 function closePocketForm() {
   document.getElementById('pocketModal').classList.remove('active');
   document.body.style.overflow = '';
+  if (document.getElementById('ob-step4') || document.getElementById('ob-step5')) {
+    updateOnboardingPockets();
+  }
 }
 
 async function savePocket(e) {
@@ -917,6 +987,9 @@ async function savePocket(e) {
   renderPockets();
   populateHistoryPocketFilter();
   renderHomeHistory();
+  if (document.getElementById('ob-step4') || document.getElementById('ob-step5')) {
+    updateOnboardingPockets();
+  }
   if (returnTo === 'detail' && index >= 0) {
     showPocketDetail(index);
   } else {
@@ -1272,12 +1345,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   await initData();
 
   document.getElementById('loginPage').style.display = 'none';
-  const navTabs = document.querySelector('.nav-tabs');
-  if (navTabs) navTabs.style.display = 'flex';
-  document.querySelector('.content').style.display = '';
-
-  showPage(null, 'accueil');
-  document.querySelector('.nav-tab')?.classList.add('active');
+  startOnboarding();
 });
 
 // Changement vers la page d'inscription
@@ -1363,12 +1431,9 @@ document.addEventListener('DOMContentLoaded', function() {
       setUserInfoFields(session.user);
       await loadMonthlyBudget();
       await initData();
-      if (navTabs) navTabs.style.display = 'flex';
-      if (content) content.style.display = '';
       if (loginPage) loginPage.style.display = 'none';
       if (registerPage) registerPage.style.display = 'none';
-      showPage(null, 'accueil');
-      document.querySelector('.nav-tab')?.classList.add('active');
+      startOnboarding();
     } else {
       if (navTabs) navTabs.style.display = 'none';
       if (content) content.style.display = 'none';
@@ -1558,6 +1623,56 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  const obStartBtn = document.getElementById('obStartBtn');
+  const obStep2Next = document.getElementById('obStep2Next');
+  const obAddAccount = document.getElementById('obAddAccount');
+  const obStep3Next = document.getElementById('obStep3Next');
+  const obCreatePocket = document.getElementById('obCreatePocket');
+  const obStep4Next = document.getElementById('obStep4Next');
+  const obAddPocketYes = document.getElementById('obAddPocketYes');
+  const obAddPocketNo = document.getElementById('obAddPocketNo');
+  const obAutoYes = document.getElementById('obAutoYes');
+  const obAutoNo = document.getElementById('obAutoNo');
+  const obFinish = document.getElementById('obFinish');
+  const range = document.getElementById('obMonthlyRange');
+  const numberInput = document.getElementById('obMonthlyInput');
+
+  if (range && numberInput) {
+    range.addEventListener('input', () => {
+      numberInput.value = range.value;
+    });
+    numberInput.addEventListener('input', () => {
+      range.value = numberInput.value;
+    });
+  }
+
+  if (obStartBtn) obStartBtn.addEventListener('click', () => showOnboardingStep(2));
+  if (obStep2Next) {
+    obStep2Next.addEventListener('click', async () => {
+      onboarding.epargneMensuelle = parseFloat(numberInput.value) || 0;
+      monthlyBudget = onboarding.epargneMensuelle;
+      await supabase
+        .from('settings')
+        .upsert({ user_id: userId, monthly_budget: monthlyBudget }, { onConflict: 'user_id' });
+      showOnboardingStep(3);
+      updateOnboardingAccounts();
+    });
+  }
+
+  if (obAddAccount) obAddAccount.addEventListener('click', openBankAccountsModal);
+  if (obStep3Next) obStep3Next.addEventListener('click', () => { showOnboardingStep(4); updateOnboardingPockets(); });
+
+  if (obCreatePocket) obCreatePocket.addEventListener('click', () => openPocketForm());
+  if (obStep4Next) obStep4Next.addEventListener('click', () => showOnboardingStep(5));
+
+  if (obAddPocketYes) obAddPocketYes.addEventListener('click', () => { openPocketForm(); });
+  if (obAddPocketNo) obAddPocketNo.addEventListener('click', () => showOnboardingStep(6));
+
+  if (obAutoYes) obAutoYes.addEventListener('click', async () => { await autoDistribute(); showOnboardingStep(7); });
+  if (obAutoNo) obAutoNo.addEventListener('click', () => { showDistribution(); });
+
+  if (obFinish) obFinish.addEventListener('click', endOnboarding);
 });
 
 // Afficher l'historique des transactions pour une poche
@@ -1862,6 +1977,9 @@ function closeBankAccountsModal() {
   modal.classList.remove('active');
   document.body.style.overflow = '';
   closeAccountForm();
+  if (document.getElementById('ob-step3')) {
+    updateOnboardingAccounts();
+  }
 }
 
 function closeTransfersModal() {
@@ -1942,6 +2060,9 @@ async function saveAccount(e) {
   closeAccountForm();
   renderAccounts();
   populateAccountSelects();
+  if (document.getElementById('ob-step3')) {
+    updateOnboardingAccounts();
+  }
 }
 
 async function deleteAccount(index) {
