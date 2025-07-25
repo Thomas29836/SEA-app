@@ -8,7 +8,7 @@ const headers = {
 };
 
 function monthsUntil(deadline: string | null): number {
-  if (!deadline) return 12; // par défaut 12 mois
+  if (!deadline) return 12;
   const target = new Date(deadline);
   const today = new Date();
   let months = (target.getFullYear() - today.getFullYear()) * 12 +
@@ -34,8 +34,8 @@ serve(async (req: Request) => {
     }
 
     let remainingBudget = monthly_budget;
+    let issues: string[] = [];
 
-    // Trier par priorité (1 -> 5)
     const sorted = pockets
       .filter((p: any) => p.goal && p.saved < p.goal)
       .sort((a: any, b: any) => (a.priority || 3) - (b.priority || 3));
@@ -46,6 +46,11 @@ serve(async (req: Request) => {
       const months = monthsUntil(p.deadline);
       const needed = Math.max(0, (p.goal - p.saved) / months);
 
+      if (needed <= 0) {
+        allocation.push({ id: p.id, name: p.name, monthly: 0 });
+        continue;
+      }
+
       const allocated = Math.min(remainingBudget, needed);
       allocation.push({
         id: p.id,
@@ -53,31 +58,34 @@ serve(async (req: Request) => {
         monthly: Math.round(allocated * 100) / 100,
       });
 
+      if (allocated < needed) {
+        const missing = needed - allocated;
+        const extraMonths = Math.ceil((p.goal - p.saved) / Math.max(allocated, 1));
+
+        issues.push(
+          `⚠️ ${p.name} : il manque ${missing.toFixed(2)}€/mois. ` +
+          `En gardant ce rythme, il te faudra environ ${extraMonths} mois pour atteindre ton objectif.`
+        );
+      }
+
       remainingBudget -= allocated;
     }
 
-    // Si du budget reste → distribuer équitablement aux autres (facultatif)
-    if (remainingBudget > 0) {
-      const remainingPockets = allocation.filter(a => a.monthly < 1);
-      if (remainingPockets.length > 0) {
-        const extra = remainingBudget / remainingPockets.length;
-        for (const a of remainingPockets) {
-          a.monthly += Math.round(extra * 100) / 100;
-        }
-      }
+    if (issues.length === 0) {
+      issues.push("✅ Tous les objectifs peuvent être atteints ce mois-ci.");
     }
 
     return new Response(
       JSON.stringify({
         allocation,
-        message: "Répartition intelligente effectuée avec succès",
+        message: issues.join(" "),
       }),
       { headers }
     );
   } catch (err) {
-    console.error("Erreur ai-distribution:", err);
+    console.error("🔥 Erreur ai-distribution locale :", err);
     return new Response(
-      JSON.stringify({ error: "Erreur interne" }),
+      JSON.stringify({ error: "Erreur interne", details: String(err) }),
       { status: 500, headers }
     );
   }
