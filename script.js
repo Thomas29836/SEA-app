@@ -108,15 +108,15 @@ function showOnboardingStep(step) {
   document.querySelectorAll('.onboarding-step').forEach(d => d.classList.add('hidden'));
   const el = document.getElementById(`ob-step${step}`);
   if (el) el.classList.remove('hidden');
-  const percent = (step - 1) / 6 * 100;
+  const percent = (step - 1) / 3 * 100;
   const bar = document.getElementById('onboardingProgressBar');
   if (bar) bar.style.width = percent + '%';
   const backBtn = document.getElementById('obBackBtn');
   if (backBtn) backBtn.classList.toggle('hidden', step === 1);
-  if (step === 3) updateOnboardingAccounts();
-  if (step === 4 || step === 5) updateOnboardingPockets();
-  if (step === 3) openBankAccountsModal();
-  if (step === 4) openPocketForm();
+  if (step === 3) {
+    updateOnboardingAccounts();
+    openBankAccountsModal();
+  }
 }
 
 function startOnboarding() {
@@ -150,20 +150,6 @@ function updateOnboardingAccounts() {
   const hasCourant = accounts.some(a => a.type === 'courant');
   const hasEpargne = accounts.some(a => a.type === 'epargne');
   nextBtn.disabled = !(hasCourant && hasEpargne);
-}
-
-function updateOnboardingPockets() {
-  const list = document.getElementById('obPocketsList');
-  const nextBtn = document.getElementById('obStep5Next') || document.getElementById('obStep4Next');
-  if (!list) return;
-  list.innerHTML = '';
-  pockets.forEach(p => {
-    const li = document.createElement('li');
-    const percent = p.goal ? Math.min(100, (p.saved / p.goal) * 100) : 0;
-    li.textContent = `${p.name} - ${Math.round(percent)}%`;
-    list.appendChild(li);
-  });
-  if (nextBtn) nextBtn.disabled = pockets.length < 1;
 }
 
 async function loadPockets() {
@@ -528,9 +514,6 @@ function closeDistributionModal() {
     document.body.style.overflow = '';
   }, 400);
   distributionChanged = false;
-  if (document.getElementById('ob-step6')) {
-    showOnboardingStep(7);
-  }
 }
 
 async function autoDistribute() {
@@ -940,9 +923,6 @@ function openPocketForm(index = -1) {
 function closePocketForm() {
   document.getElementById('pocketModal').classList.remove('active');
   document.body.style.overflow = '';
-  if (document.getElementById('ob-step4') || document.getElementById('ob-step5')) {
-    updateOnboardingPockets();
-  }
 }
 
 async function savePocket(e) {
@@ -992,13 +972,6 @@ async function savePocket(e) {
   renderPockets();
   populateHistoryPocketFilter();
   renderHomeHistory();
-  const inOnboarding = document.getElementById('ob-step4') || document.getElementById('ob-step5');
-  if (inOnboarding) {
-    updateOnboardingPockets();
-    if (onboarding.step === 4) {
-      showOnboardingStep(5);
-    }
-  }
   if (returnTo === 'detail' && index >= 0) {
     showPocketDetail(index);
   } else {
@@ -1637,11 +1610,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const obStep2Next = document.getElementById('obStep2Next');
   const obAddAccount = document.getElementById('obAddAccount');
   const obStep3Next = document.getElementById('obStep3Next');
-  const obCreatePocket = document.getElementById('obCreatePocket');
-  const obAddPocket = document.getElementById('obAddPocket');
-  const obStep5Next = document.getElementById('obStep5Next');
-  const obAutoYes = document.getElementById('obAutoYes');
-  const obAutoNo = document.getElementById('obAutoNo');
   const obFinish = document.getElementById('obFinish');
   const range = document.getElementById('obMonthlyRange');
   const numberInput = document.getElementById('obMonthlyInput');
@@ -1679,18 +1647,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (obAddAccount) obAddAccount.addEventListener('click', openBankAccountsModal);
   if (obStep3Next) obStep3Next.addEventListener('click', () => { showOnboardingStep(4); });
 
-  if (obCreatePocket) obCreatePocket.addEventListener('click', () => openPocketForm());
-
-  if (obAddPocket) obAddPocket.addEventListener('click', () => openPocketForm());
-  if (obStep5Next) obStep5Next.addEventListener('click', () => showOnboardingStep(6));
-
   if (backBtn) backBtn.addEventListener('click', () => {
     const prev = Math.max(1, onboarding.step - 1);
     showOnboardingStep(prev);
   });
-
-  if (obAutoYes) obAutoYes.addEventListener('click', async () => { await autoDistribute(); showOnboardingStep(7); });
-  if (obAutoNo) obAutoNo.addEventListener('click', () => { showDistribution(); });
 
   if (obFinish) obFinish.addEventListener('click', endOnboarding);
 });
