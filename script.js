@@ -64,6 +64,39 @@ function formatPercent(value) {
   return Math.round(value) + ' %';
 }
 
+function hideRecommendation() {
+  const box = document.getElementById('recommendationBox');
+  if (box) box.style.display = 'none';
+}
+
+function displayRecommendations(message, zeroNames = []) {
+  const box = document.getElementById('recommendationBox');
+  if (!box) return;
+  const parts = message.split(/(?=✅|⚠️)/g).map(p => p.trim()).filter(Boolean);
+  const hasWarning = parts.some(p => p.startsWith('⚠️'));
+  const title = hasWarning
+    ? '⚠️ Attention à certains objectifs !'
+    : '🚀 Bien joué !';
+  const itemsHtml = parts
+    .map(part => {
+      const warning = part.startsWith('⚠️');
+      const icon = warning ? '⚠️' : '✅';
+      let text = part.replace(/^⚠️|^✅/, '').trim();
+      const nameMatch = text.match(/^([^:]+)\s*:/);
+      const name = nameMatch ? nameMatch[1].trim() : '';
+      if (zeroNames.includes(name)) {
+        text = text.replace(
+          /En gardant ce rythme, il te faudra environ[^.]*mois pour atteindre ton objectif\./,
+          'Il faut d\u2019abord terminer une poche d\u2019\u00e9pargne avant de pouvoir allouer un montant \u00e0 cet objectif.'
+        );
+      }
+      return `<li class="recommendation-item ${warning ? 'warning' : 'success'}"><span class="icon">${icon}</span><span>${text}</span></li>`;
+    })
+    .join('');
+  box.innerHTML = `<h4 class="recommendation-title">${title}</h4><ul class="recommendation-list">${itemsHtml}</ul>`;
+  box.style.display = 'block';
+}
+
 async function loadPockets() {
   const { data, error } = await supabase
     .from('pockets')
@@ -399,6 +432,7 @@ async function showDistribution() {
   renderDistribution();
   distributionChanged = false;
   updateDistributionSummary();
+  hideRecommendation();
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -406,7 +440,8 @@ async function showDistribution() {
 function closeDistributionModal() {
   const modal = document.getElementById('distributionModal');
   if (!modal) return;
-  if (isDistributionOverLimit()) return;  
+  if (isDistributionOverLimit()) return;
+  hideRecommendation();
   modal.classList.add('closing');
   modal.classList.remove('active');
   setTimeout(() => {
@@ -450,6 +485,7 @@ async function autoDistribute() {
 
     const result = await response.json();
 
+    const zeroNames = [];
     if (Array.isArray(result.allocation)) {
       for (const dist of result.allocation) {
         const pocket = pockets.find(p => p.id === dist.id);
@@ -459,6 +495,9 @@ async function autoDistribute() {
             .from('pockets')
             .update({ monthly: dist.monthly })
             .eq('id', pocket.id);
+          if (dist.monthly === 0 && (pocket.goal || 0) > (pocket.saved || 0)) {
+            zeroNames.push(pocket.name);
+          }
         }
       }
     }
@@ -474,7 +513,7 @@ async function autoDistribute() {
     }
 
     if (result.message) {
-      alert(result.message);
+      displayRecommendations(result.message, zeroNames);
     }
 
     distributionChanged = true;
