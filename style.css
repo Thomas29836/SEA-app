@@ -689,12 +689,14 @@ h3 {
   font-weight: 700;
 }
 
-.pocket-card .saved-amount,
-.pocket-card .goal-amount {
-  font-weight: 700;
+
+.pocket-card .saved-amount {
+  font-weight: 400;
+  font-size: 0.9rem;
 }
 
 .pocket-card .goal-amount {
+  font-weight: 700;
   margin: 0.25rem 0;
 }
 

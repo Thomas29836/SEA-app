@@ -313,9 +313,19 @@ function displayPockets() {
         title.className = 'pocket-title';
         title.textContent = pocket.name;
 
+        const amountsRow = document.createElement('div');
+        amountsRow.className = 'amounts-row';
+
+        const savedAmount = document.createElement('p');
+        savedAmount.className = 'saved-amount';
+        savedAmount.textContent = `${formatNumber(pocket.saved)}€`;
+
         const goalText = document.createElement('p');
         goalText.className = 'goal-amount';
         goalText.textContent = `${formatNumber(pocket.goal)}€`;
+
+        amountsRow.appendChild(savedAmount);
+        amountsRow.appendChild(goalText);
 
         const progress = document.createElement('div');
         progress.className = 'progress';
@@ -326,8 +336,8 @@ function displayPockets() {
         progress.appendChild(bar);
 
         card.appendChild(title);
-        card.appendChild(goalText);
-        card.appendChild(progress);        
+        card.appendChild(amountsRow);
+        card.appendChild(progress);       
 
       container.appendChild(card);
     });
