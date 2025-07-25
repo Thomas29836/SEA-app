@@ -111,10 +111,12 @@ function showOnboardingStep(step) {
   const percent = (step - 1) / 6 * 100;
   const bar = document.getElementById('onboardingProgressBar');
   if (bar) bar.style.width = percent + '%';
-  const txt = document.getElementById('onboardingStepText');
-  if (txt) txt.textContent = `Étape ${step}/7`;
+  const backBtn = document.getElementById('obBackBtn');
+  if (backBtn) backBtn.classList.toggle('hidden', step === 1);
   if (step === 3) updateOnboardingAccounts();
   if (step === 4 || step === 5) updateOnboardingPockets();
+  if (step === 3) openBankAccountsModal();
+  if (step === 4) openPocketForm();
 }
 
 function startOnboarding() {
@@ -145,20 +147,23 @@ function updateOnboardingAccounts() {
     li.textContent = acc.bank ? `${acc.name} - ${acc.bank}` : acc.name;
     list.appendChild(li);
   });
-  nextBtn.disabled = accounts.length < 2;
+  const hasCourant = accounts.some(a => a.type === 'courant');
+  const hasEpargne = accounts.some(a => a.type === 'epargne');
+  nextBtn.disabled = !(hasCourant && hasEpargne);
 }
 
 function updateOnboardingPockets() {
   const list = document.getElementById('obPocketsList');
-  const nextBtn = document.getElementById('obStep4Next');
-  if (!list || !nextBtn) return;
+  const nextBtn = document.getElementById('obStep5Next') || document.getElementById('obStep4Next');
+  if (!list) return;
   list.innerHTML = '';
   pockets.forEach(p => {
     const li = document.createElement('li');
-    li.textContent = p.name;
+    const percent = p.goal ? Math.min(100, (p.saved / p.goal) * 100) : 0;
+    li.textContent = `${p.name} - ${Math.round(percent)}%`;
     list.appendChild(li);
   });
-  nextBtn.disabled = pockets.length < 1;
+  if (nextBtn) nextBtn.disabled = pockets.length < 1;
 }
 
 async function loadPockets() {
@@ -987,8 +992,12 @@ async function savePocket(e) {
   renderPockets();
   populateHistoryPocketFilter();
   renderHomeHistory();
-  if (document.getElementById('ob-step4') || document.getElementById('ob-step5')) {
+  const inOnboarding = document.getElementById('ob-step4') || document.getElementById('ob-step5');
+  if (inOnboarding) {
     updateOnboardingPockets();
+    if (onboarding.step === 4) {
+      showOnboardingStep(5);
+    }
   }
   if (returnTo === 'detail' && index >= 0) {
     showPocketDetail(index);
@@ -1629,22 +1638,29 @@ document.addEventListener('DOMContentLoaded', function() {
   const obAddAccount = document.getElementById('obAddAccount');
   const obStep3Next = document.getElementById('obStep3Next');
   const obCreatePocket = document.getElementById('obCreatePocket');
-  const obStep4Next = document.getElementById('obStep4Next');
-  const obAddPocketYes = document.getElementById('obAddPocketYes');
-  const obAddPocketNo = document.getElementById('obAddPocketNo');
+  const obAddPocket = document.getElementById('obAddPocket');
+  const obStep5Next = document.getElementById('obStep5Next');
   const obAutoYes = document.getElementById('obAutoYes');
   const obAutoNo = document.getElementById('obAutoNo');
   const obFinish = document.getElementById('obFinish');
   const range = document.getElementById('obMonthlyRange');
   const numberInput = document.getElementById('obMonthlyInput');
+  const monthlyDisplay = document.getElementById('obMonthlyDisplay');
+  const backBtn = document.getElementById('obBackBtn');
 
   if (range && numberInput) {
+    const syncDisplay = () => {
+      if (monthlyDisplay) monthlyDisplay.textContent = `${numberInput.value}€`;
+    };
     range.addEventListener('input', () => {
       numberInput.value = range.value;
+      syncDisplay();
     });
     numberInput.addEventListener('input', () => {
       range.value = numberInput.value;
+      syncDisplay();
     });
+    syncDisplay();
   }
 
   if (obStartBtn) obStartBtn.addEventListener('click', () => showOnboardingStep(2));
@@ -1661,13 +1677,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (obAddAccount) obAddAccount.addEventListener('click', openBankAccountsModal);
-  if (obStep3Next) obStep3Next.addEventListener('click', () => { showOnboardingStep(4); updateOnboardingPockets(); });
+  if (obStep3Next) obStep3Next.addEventListener('click', () => { showOnboardingStep(4); });
 
   if (obCreatePocket) obCreatePocket.addEventListener('click', () => openPocketForm());
-  if (obStep4Next) obStep4Next.addEventListener('click', () => showOnboardingStep(5));
 
-  if (obAddPocketYes) obAddPocketYes.addEventListener('click', () => { openPocketForm(); });
-  if (obAddPocketNo) obAddPocketNo.addEventListener('click', () => showOnboardingStep(6));
+  if (obAddPocket) obAddPocket.addEventListener('click', () => openPocketForm());
+  if (obStep5Next) obStep5Next.addEventListener('click', () => showOnboardingStep(6));
+
+  if (backBtn) backBtn.addEventListener('click', () => {
+    const prev = Math.max(1, onboarding.step - 1);
+    showOnboardingStep(prev);
+  });
 
   if (obAutoYes) obAutoYes.addEventListener('click', async () => { await autoDistribute(); showOnboardingStep(7); });
   if (obAutoNo) obAutoNo.addEventListener('click', () => { showDistribution(); });

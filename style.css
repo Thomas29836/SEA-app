@@ -1248,6 +1248,11 @@ h3 {
   margin-right: 0.25rem;
   font-weight: 700;
 }
+#obCreatePocket .btn-plus {
+  color: #fff;
+  margin-right: 0.25rem;
+  font-weight: 700;
+}
 #homeAddPocketBtn:hover {
   background: linear-gradient(120deg, #8c45c4, #c63d83);
   color: #fff;
@@ -1338,7 +1343,7 @@ h3 {
 #onboardingProgressBar {
   height: 100%;
   width: 0;
-  background: #3b82f6;
+  background: linear-gradient(90deg, #003a9e 0%, #9544e3 100%);
   transition: width 0.3s;
 }
 
@@ -1364,4 +1369,32 @@ h3 {
 
 .simple-list li {
   padding: 0.25rem 0;
+}
+
+#onboarding .btn {
+  width: 100%;
+  color: #fff;
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #003a9e 0%, #9544e3 100%);
+}
+
+#onboarding .btn:disabled {
+  opacity: 0.6;
+}
+
+.onboarding-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem;
+}
+
+.monthly-display {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }

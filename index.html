@@ -55,10 +55,10 @@
   </div>
 
   <div id="onboarding" style="display:none;">
+    <button id="obBackBtn" class="onboarding-back hidden">⬅️ Retour</button>
     <div class="progress-bar-container">
       <div class="progress-bar" id="onboardingProgressBar"></div>
     </div>
-    <p id="onboardingStepText" class="progress-label">Étape 1/7</p>
 
     <div id="ob-step1" class="onboarding-step">
       <div class="onboarding-brand">FEEN</div>
@@ -69,33 +69,32 @@
 
     <div id="ob-step2" class="onboarding-step hidden">
       <p>Combien souhaites-tu épargner chaque mois&nbsp;?</p>
+      <div id="obMonthlyDisplay" class="monthly-display">0€</div>
       <div class="budget-input-row" style="justify-content:center;">
-        <input type="range" id="obMonthlyRange" min="0" max="2000" step="10" />
-        <input type="number" id="obMonthlyInput" min="0" step="10" />
+        <input type="range" id="obMonthlyRange" min="0" max="5000" step="100" />
+        <input type="number" id="obMonthlyInput" min="0" max="5000" step="100" />
         <span>€/mois</span>
       </div>
       <button id="obStep2Next" class="btn btn-primary" style="margin-top:1rem;">Continuer</button>
     </div>
 
     <div id="ob-step3" class="onboarding-step hidden">
-      <p>Ajoute tes comptes pour alimenter tes poches d’épargne.</p>
+      <p>Crée d’abord un compte courant, puis au moins un compte épargne pour continuer.</p>
       <button id="obAddAccount" class="btn btn-primary" style="margin:1rem 0;">Ajouter un compte</button>
       <ul id="obAccountsList" class="simple-list"></ul>
       <button id="obStep3Next" class="btn btn-primary" disabled>Continuer</button>
     </div>
 
     <div id="ob-step4" class="onboarding-step hidden">
-      <button id="obCreatePocket" class="btn btn-primary" style="margin-bottom:1rem;">Créer ma première poche</button>
+      <button id="obCreatePocket" class="btn btn-primary" style="margin-bottom:1rem;" type="button" onclick="openPocketForm()"><span class="btn-plus">+</span>Nouveau</button>
       <ul id="obPocketsList" class="simple-list"></ul>
       <button id="obStep4Next" class="btn btn-primary" disabled>Continuer</button>
     </div>
 
     <div id="ob-step5" class="onboarding-step hidden">
-      <p>Veux-tu ajouter d’autres poches maintenant&nbsp;?</p>
-      <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;">
-        <button id="obAddPocketYes" class="btn btn-secondary">Oui, ajouter une poche</button>
-        <button id="obAddPocketNo" class="btn btn-primary">Non, continuer</button>
-      </div>
+      <ul id="obPocketsList" class="simple-list"></ul>
+      <button id="obAddPocket" class="btn btn-secondary" style="margin-bottom:1rem;">Ajouter une poche</button>
+      <button id="obStep5Next" class="btn btn-primary" disabled>Continuer</button>
     </div>
 
     <div id="ob-step6" class="onboarding-step hidden">
