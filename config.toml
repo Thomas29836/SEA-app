@@ -1,0 +1,6 @@
+
+[functions.ai-distribution]
+enabled = true
+verify_jwt = false
+import_map = "./functions/ai-distribution/deno.json"
+entrypoint = "./functions/ai-distribution/index.ts"

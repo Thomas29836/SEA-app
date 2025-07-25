@@ -416,41 +416,72 @@ function closeDistributionModal() {
   distributionChanged = false;
 }
 
-function autoDistribute() {
+async function autoDistribute() {
   if (pockets.length === 0) return;
 
-  // Calculer la mensualité requise pour chaque poche
-  let totalNeeded = 0;
-  pockets.forEach(p => {
-    if (!p.goal || p.saved >= p.goal) {
-      p._autoMonthly = 0;
-      return;
+  const inputData = {
+    monthly_budget: monthlyBudget,
+    pockets: pockets.map(p => ({
+      id: p.id,
+      name: p.name,
+      saved: p.saved,
+      goal: p.goal,
+      priority: p.priority,
+      deadline: p.deadline,
+    })),
+  };
+
+  try {
+    const response = await fetch(
+      'https://sumuxiqjpctmplgbbxom.functions.supabase.co/ai-distribution',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: supabaseKey,
+        },
+        body: JSON.stringify(inputData),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Request failed');
     }
-    const remaining = Math.max(0, (p.goal || 0) - (p.saved || 0));
-    const monthsLeft = monthsUntil(p.deadline);
-    const months = monthsLeft > 0 ? monthsLeft : 1;
-    p._autoMonthly = remaining / months;
-    totalNeeded += p._autoMonthly;
-  });
 
-  // Ajuster proportionnellement si le total dépasse le budget disponible
-  const ratio = totalNeeded > monthlyBudget ? monthlyBudget / totalNeeded : 1;
+    const result = await response.json();
 
-  pockets.forEach(p => {
-    const monthly = (p._autoMonthly || 0) * ratio;
-    p.monthly = monthly;
-    delete p._autoMonthly;
-    supabase.from('pockets').update({ monthly }).eq('id', p.id);
-  });
+    if (Array.isArray(result.allocation)) {
+      for (const dist of result.allocation) {
+        const pocket = pockets.find(p => p.id === dist.id);
+        if (pocket) {
+          pocket.monthly = dist.monthly;
+          await supabase
+            .from('pockets')
+            .update({ monthly: dist.monthly })
+            .eq('id', pocket.id);
+        }
+      }
+    }
 
-  renderDistribution();
-  updateDistributionSummary();
-  updateTotals();
-  displayPockets();
-  if (document.getElementById('pocketDetail')?.classList.contains('active')) {
-    showPocketDetail(currentPocketIndex);
+    renderDistribution();
+    updateDistributionSummary();
+    updateTotals();
+    displayPockets();
+    if (
+      document.getElementById('pocketDetail')?.classList.contains('active')
+    ) {
+      showPocketDetail(currentPocketIndex);
+    }
+
+    if (result.message) {
+      alert(result.message);
+    }
+
+    distributionChanged = true;
+  } catch (error) {
+    console.error(error);
+    alert('Erreur lors de la répartition intelligente.');
   }
-  distributionChanged = true;
 }
 
 function resetDistribution() {
